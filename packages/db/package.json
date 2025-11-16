@@ -1,5 +1,5 @@
 {
-  "name": "db",
+  "name": "@workspace/db",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
@@ -16,5 +16,8 @@
   },
   "dependencies": {
     "@prisma/client": "^6.19.0"
+  },
+  "exports":{
+    ".": "./src/index.ts"
   }
 }
