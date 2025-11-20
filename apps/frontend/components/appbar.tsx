@@ -49,13 +49,16 @@ export function Appbar() {
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="h-9 w-9 rounded-full p-0">
             <Avatar className="h-8 w-8">
-              <AvatarImage
-                src={session?.user?.image ?? ""}
-                alt={session?.user?.name ?? "User"}
-              />
-              <AvatarFallback>
-                {getInitials(session?.user?.name)}
-              </AvatarFallback>
+              {session?.user?.image !== null ? (
+                <AvatarImage
+                  src={session?.user?.image}
+                  alt={session?.user?.name ?? "User"}
+                />
+              ) : (
+                <AvatarFallback>
+                  {getInitials(session?.user?.name)}
+                </AvatarFallback>
+              )}
             </Avatar>
           </Button>
         </DropdownMenuTrigger>

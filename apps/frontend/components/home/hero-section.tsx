@@ -18,13 +18,13 @@ export default function HeroSection() {
         </p>
 
         <div className="flex items-center justify-center gap-4">
-          <Button size="lg" onClick={() => router.push("/signup")}>
+          <Button size="lg" onClick={() => router.push("/connect-github")}>
             Get Started
           </Button>
           <Button
             variant="outline"
             size="lg"
-            onClick={() => router.push("/login")}
+            onClick={() => router.push("/connect-github")}
           >
             Log In
           </Button>
