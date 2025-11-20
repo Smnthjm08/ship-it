@@ -37,7 +37,7 @@ export function Appbar() {
   };
 
   return (
-    <header className="flex items-center justify-between px-8 py-4 border-b-2 h-16">
+    <header className="flex items-center justify-between px-8 py-4 border-b-2 border-dashed border-gray-600 h-16">
       <Link href="/dashboard">
         <div className="flex gap-2 items-center">
           <LogsIcon width={20} height={20} />

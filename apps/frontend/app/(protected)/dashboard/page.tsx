@@ -33,20 +33,26 @@ export default async function DashboardPage() {
   const data: DashboardData = await res.json();
 
   return (
-    <div className="min-h-[calc(100vh-64px)] p-6 lg:p-10">
+    <div className="min-h-[calc(100vh-64px)] py--6 lg:py-8">
       <div className="max-w-7xl mx-auto space-y-8">
         <div>
           <h1 className="text-3xl font-bold">Dashboard</h1>
-          <p className="text-gray-400 mt-2">
-            Manage your projects and GitHub integrations
+          <p className="text-gray-400 text-md mt-2">
+            Manage your Projects and GitHub integrations
           </p>
         </div>
 
-        <GitHubSection installations={data.github} />
-        <ProjectsSection
-          projects={data.projects}
-          hasGitHubConnection={data.github.length > 0}
-        />
+        <div className="flex gap-12 justify-between">
+          <div className="flex-1/3">
+            <GitHubSection installations={data.github} />
+          </div>
+          <div className="flex-2/3">
+            <ProjectsSection
+              projects={data.projects}
+              hasGitHubConnection={data.github.length > 0}
+            />
+          </div>
+        </div>
       </div>
     </div>
   );

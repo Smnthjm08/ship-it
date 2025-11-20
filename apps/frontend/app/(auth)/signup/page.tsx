@@ -28,7 +28,7 @@ export default function SignUp() {
   const router = useRouter();
 
   return (
-    <Card className="w-full min-w-md mx-auto shadow-lg rounded-2xl border-none">
+    <Card className="w-full min-w-md mx-auto shadow-lg rounded-xl border-none">
       <CardHeader>
         <CardTitle className="text-lg md:text-xl">Sign Up</CardTitle>
         <CardDescription className="text-xs md:text-sm">

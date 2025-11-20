@@ -1,7 +1,7 @@
-export default function ProjectsPage() {
+export default function ProjectPage() {
   return (
     <div>
-      <div>Project/[id] Page</div>
+      <div>ProjectPage</div>
     </div>
   );
 }
