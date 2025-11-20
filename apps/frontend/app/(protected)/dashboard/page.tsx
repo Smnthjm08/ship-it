@@ -32,8 +32,10 @@ export default async function DashboardPage() {
 
   const data: DashboardData = await res.json();
 
+  console.log("data", data);
+
   return (
-    <div className="min-h-[calc(100vh-64px)] py--6 lg:py-8">
+    <div className="min-h-[calc(100vh-64px)] px-4 py-6 sm:px-6 md:px-8 lg:py-8">
       <div className="max-w-7xl mx-auto space-y-8">
         <div>
           <h1 className="text-3xl font-bold">Dashboard</h1>
@@ -42,11 +44,11 @@ export default async function DashboardPage() {
           </p>
         </div>
 
-        <div className="flex gap-12 justify-between">
-          <div className="flex-1/3">
+        <div className="flex flex-col lg:flex-row gap-6 lg:gap-12">
+          <div className="w-full lg:w-1/3">
             <GitHubSection installations={data.github} />
           </div>
-          <div className="flex-2/3">
+          <div className="w-full lg:w-2/3">
             <ProjectsSection
               projects={data.projects}
               hasGitHubConnection={data.github.length > 0}

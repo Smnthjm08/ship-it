@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { Project } from "@/types/types";
 import Link from "next/link";
+import { ScrollArea } from "../ui/scroll-area";
 
 export default function ProjectsSection({
   projects,
@@ -36,7 +37,7 @@ export default function ProjectsSection({
         </h2>
         {projects.length > 0 && hasGitHubConnection && (
           <Button asChild>
-            <Link href="/projects/new">
+            <Link href="/project/new">
               <Plus className="w-4 h-4 mr-2" />
               New Project
             </Link>
@@ -45,11 +46,13 @@ export default function ProjectsSection({
       </div>
 
       {projects.length > 0 ? (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2">
-          {projects.map((project) => (
-            <ProjectCard key={project.id} project={project} />
-          ))}
-        </div>
+        <ScrollArea className="h-[calc(100vh-280px)] pr-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+            {projects.map((project) => (
+              <ProjectCard key={project.id} project={project} />
+            ))}
+          </div>
+        </ScrollArea>
       ) : (
         <Empty className="border rounded-lg">
           <EmptyHeader>
@@ -70,7 +73,7 @@ export default function ProjectsSection({
           <EmptyContent>
             {hasGitHubConnection ? (
               <Button asChild>
-                <Link href="/projects/new">
+                <Link href="/project/new">
                   <Plus className="w-4 h-4 mr-2" />
                   Create Project
                 </Link>
@@ -92,7 +95,7 @@ export default function ProjectsSection({
 
 function ProjectCard({ project }: { project: Project }) {
   return (
-    <Card className="hover:shadow-lg transition-shadow border-l-4 border-l-blue-500">
+    <Card className="hover:shadow-lg transition-shadow border-l-4 border-l-primary">
       <CardHeader>
         <div className="flex items-start justify-between">
           <CardTitle className="text-lg">{project.name}</CardTitle>
@@ -111,7 +114,7 @@ function ProjectCard({ project }: { project: Project }) {
               href={project.repoUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-blue-600 hover:underline flex items-center gap-1 truncate"
+              className="text-orange-600 hover:underline flex items-center gap-1 truncate"
             >
               {project.owner}/{project.repoName}
               <ExternalLink className="w-3 h-3" />
