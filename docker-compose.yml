@@ -1,0 +1,40 @@
+version: "3.8"
+
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/dev/Dockerfile.frontend
+    volumes:
+      - ./:/app
+      - /app/node_modules
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/postgres
+    depends_on:
+      - db
+    networks:
+      - ship-it-nw
+
+  db:
+    image: postgres:16
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/postgres
+    
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+    ports:
+      - "5434:5432"
+    networks:
+      - ship-it-nw
+    
+
+volumes:
+  db_data:
+
+
+networks:
+  ship-it-nw:
+    driver: bridge
