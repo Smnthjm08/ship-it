@@ -6,7 +6,6 @@ RUN npm i -g pnpm
 
 ENV PRISMA_SKIP_POSTINSTALL_GENERATE=true
 
-# Fake DB URL ONLY for build — Prisma does NOT connect.
 ARG DATABASE_URL="postgresql://fake:fake@localhost:5432/fake"
 ENV DATABASE_URL=$DATABASE_URL
 
@@ -25,4 +24,5 @@ RUN pnpm install
 
 EXPOSE 3000
 
-CMD ["sh", "-c", "pnpm db:migrate && pnpm db:generate && pnpm --filter frontend dev --hostname 0.0.0.0"]
+# dev
+CMD ["pnpm", "--filter", "frontend", "dev", "--hostname", "0.0.0.0"]

@@ -72,7 +72,7 @@ export default function ProjectsSection({
           </EmptyHeader>
           <EmptyContent>
             {hasGitHubConnection ? (
-              <Button asChild>
+              <Button asChild disabled>
                 <Link href="/new">
                   <Plus className="w-4 h-4 mr-2" />
                   Create Project

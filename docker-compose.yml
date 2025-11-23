@@ -4,14 +4,14 @@ services:
   frontend:
     build:
       context: .
-      dockerfile: docker/dev/Dockerfile.frontend
+      dockerfile: docker/Dockerfile.frontend
     volumes:
       - ./:/app
-      - /app/node_modules
+      # - /app/node_modules
     ports:
       - "3000:3000"
     environment:
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432/postgres
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/shipit
     depends_on:
       - db
     networks:
@@ -20,8 +20,9 @@ services:
   db:
     image: postgres:16
     environment:
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432/postgres
-    
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: docker
     volumes:
       - db_data:/var/lib/postgresql/data
 

@@ -46,7 +46,7 @@ export async function GET(req: NextRequest) {
     const page = Number(searchParams.get("page") ?? "1");
     const per_page = Number(searchParams.get("per_page") ?? "5");
 
-    let repos: any[] = [];
+    let repos: unknown[] = [];
 
     if (search) {
       const { data: authUser } = await octokit.request("GET /user");

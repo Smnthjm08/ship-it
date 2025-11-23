@@ -1,31 +1,53 @@
-# shipIt
+# 🚀 Ship-It – Dev Setup
 
-This template is for creating a monorepo with shadcn/ui.
+## 📥 Clone the repo
 
-## Usage
-
-```bash
-pnpm dlx shadcn@latest init
+```sh
+git clone https://github.com/smnthjm08/ship-it.git
+cd ship-it
 ```
 
-## Adding components
+## ⚙️ Manual Setup (Local Machine)
 
-To add components to your app, run the following command at the root of your `web` app:
-
-```bash
-pnpm dlx shadcn@latest add button -c apps/web
+```sh
+cp .env.example .env     # fill required fields
+pnpm install
+pnpm db:migrate
+pnpm run dev
 ```
 
-This will place the ui components in the `packages/ui/src/components` directory.
+Open: [http://localhost:3000](http://localhost:3000)
 
-## Tailwind
+---
 
-Your `tailwind.config.ts` and `globals.css` are already set up to use the components from the `ui` package.
+## 🐳 Docker Setup (DB in Docker)
 
-## Using components
+1. Make sure `.env` and `docker-compose.yml` use the same DB credentials:
 
-To use the components in your app, import them from the `ui` package.
+   ```sh
+   POSTGRES_USER=postgres
+   POSTGRES_PASSWORD=postgres
+   POSTGRES_DB=docker
+   DATABASE_URL=postgresql://postgres:postgres@db:5432/docker
+   ```
 
-```tsx
-import { Button } from "@workspace/ui/components/button";
+2. Start Docker:
+
+   ```sh
+   docker compose up --build
+   ```
+
+3. Visit:
+   👉 [http://localhost:3000](http://localhost:3000)
+
+---
+
+## ✔️ Useful Commands
+
+```sh
+pnpm db:migrate     # run migrations
+pnpm db:generate    # regenerate Prisma types
 ```
+
+<!-- ![DATABASE SCHEMA](image.png) -->
+<!-- ![Arch design](image.png) -->
