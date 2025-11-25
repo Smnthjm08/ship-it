@@ -4,6 +4,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
     "db:generate": "npx prisma generate",
     "db:migrate": "npx prisma migrate dev"
   },

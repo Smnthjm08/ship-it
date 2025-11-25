@@ -24,7 +24,12 @@
         "dist"
       ]
     },
-    "start": {},
+    "clean": {
+      "cache": false
+    },
+    "start": {
+      "dependsOn": ["^build"]
+    },
     "lint": {
       "dependsOn": [
         "^lint"
