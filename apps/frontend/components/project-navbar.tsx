@@ -2,7 +2,6 @@
 
 import { usePathname, useParams } from "next/navigation";
 import Link from "next/link";
-import { Button } from "./ui/button";
 
 export default function ProjectNavBar() {
   const pathname = usePathname();

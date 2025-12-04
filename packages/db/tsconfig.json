@@ -2,10 +2,11 @@
   "extends": "@workspace/typescript-config/base.json",
   "compilerOptions": {
     "forceConsistentCasingInFileNames": true,
-    "rootDir": "src",
-    "module": "esnext",
-    "moduleResolution": "bundler",
-    "types": ["node"],
+    "rootDir": "./src",
+    "outDir": "./dist"
+    // "module": "esnext",
+    // "moduleResolution": "bundler",
+    // "types": ["node"],
     // "type": "module"
   },
   "include": ["src"],

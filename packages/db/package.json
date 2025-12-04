@@ -1,9 +1,10 @@
 {
   "name": "@workspace/db",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc -p tsconfig.json",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
     "db:generate": "npx prisma generate",
     "db:migrate": "npx prisma migrate dev"
@@ -13,6 +14,7 @@
   "license": "ISC",
   "description": "",
   "devDependencies": {
+    "@types/node": "^20.19.9",
     "@workspace/eslint-config": "workspace:^",
     "@workspace/typescript-config": "workspace:*",
     "prisma": "^6.19.0"
@@ -20,7 +22,7 @@
   "dependencies": {
     "@prisma/client": "^6.19.0"
   },
-  "exports":{
+  "exports": {
     ".": "./src/index.ts"
   }
 }

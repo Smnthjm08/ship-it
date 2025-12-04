@@ -1,11 +1,12 @@
 {
   "name": "@workspace/shared",
   "version": "1.0.0",
-  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc -p tsconfig.json",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
   },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -25,8 +26,8 @@
     "./auth": "./src/auth/auth.ts",
     "./auth/client": "./src/auth/client.ts",
     "./redis/client": "./src/redis/client.ts",
-    "./redis/subscriber": "./src/redis/subscriber.ts",
     "./redis/publisher": "./src/redis/publisher.ts",
+    "./redis/subscriber": "./src/redis/subscriber.ts",
     "./redis/queue": "./src/redis/queue.ts"
   }
 }

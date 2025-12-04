@@ -1,4 +1,4 @@
-import { createClient, RedisClientType } from "redis";
+import { createClient, type RedisClientType } from "redis";
 
 export const redisQueue: RedisClientType = createClient({
   url: process.env.REDIS_URL,

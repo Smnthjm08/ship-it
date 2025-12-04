@@ -1,11 +1,11 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
-  req: Request,
-  { params }: { params: { id: string } },
-) {
+  req: NextRequest,
+  context: { params: Promise<{ id: string }> },
+): Promise<Response> {
   try {
-    const projectId = params.id;
+    const { id: projectId } = await context.params;
 
     return NextResponse.json({
       status: "healthy!",
@@ -14,6 +14,7 @@ export async function GET(
     });
   } catch (error) {
     console.error("Error in health check:", error);
+
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 },
