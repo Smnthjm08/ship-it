@@ -27,7 +27,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     if (!repo || typeof repo !== "string" || !repo.includes("/")) {
       return NextResponse.json(
         { error: "Invalid repo format. Expected 'owner/repo'" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -71,7 +71,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
     return NextResponse.json(
       { error: "Failed to create project" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

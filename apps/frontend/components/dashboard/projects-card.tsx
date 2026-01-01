@@ -1,3 +1,5 @@
+"use client";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -20,6 +22,7 @@ import {
 import { Project } from "@/types/types";
 import Link from "next/link";
 import { ScrollArea } from "../ui/scroll-area";
+import { useRouter } from "next/navigation";
 
 export default function ProjectsSection({
   projects,
@@ -28,6 +31,8 @@ export default function ProjectsSection({
   projects: Project[];
   hasGitHubConnection: boolean;
 }) {
+  const router = useRouter();
+
   return (
     <div>
       <div className="flex justify-between items-center mb-4">
@@ -49,7 +54,13 @@ export default function ProjectsSection({
         <ScrollArea className="h-[calc(100vh-280px)] pr-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
             {projects.map((project) => (
-              <ProjectCard key={project.id} project={project} />
+              <div
+                onClick={() => router.push(`/project/${project.id}`)}
+                key={project.id}
+                className="cursor-pointer"
+              >
+                <ProjectCard project={project} />
+              </div>
             ))}
           </div>
         </ScrollArea>

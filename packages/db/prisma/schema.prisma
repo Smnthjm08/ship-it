@@ -43,7 +43,7 @@ model Account {
   id                    String    @id @default(cuid())
   accountId             String
   providerId            String
-  accessToken           String?
+  accessToken           String? // important for github api calls
   refreshToken          String?
   idToken               String?
   accessTokenExpiresAt  DateTime?

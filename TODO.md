@@ -1,18 +1,14 @@
 # Ship-It TODO
 
-- [ ] Create `/api/deploy` (or `/api/new`) endpoint
-- [ ] Create Deployment record in DB with status "queued"
-- [ ] Push deploymentId to Redis queue
-- [ ] Return response `{ projectId, deploymentId }`
-- [ ] Add S3 client inside shared package
-- [ ] Create helper `uploadFile()` in shared package
-- [ ] Create helper `downloadFile()` in shared package
-- [ ] Create helper `listFiles()` in shared package
+- [x] Create `/api/deploy` (or `/api/new`) endpoint
+- [x] Create Deployment record in DB with status "queued"
+- [x] Push deploymentId to Redis queue
+- [x] Return response `{ projectId, deploymentId }`
+- [x] Add S3 client inside shared package
+- [x] Create helper `uploadFile()` in shared package
 
-- [ ] Add shared package `packages/redis`
-- [ ] Export Redis client instance
-- [ ] Export Redis subscriber instance
-- [ ] Export Redis queue instance
+- [x] Add shared package `packages/redis`
+- [x] Export Redis client, subscriber, queue instances
 
 - [ ] In worker (shipyard): connect to Redis queue
 - [ ] Implement infinite loop reading `deploy-queue`

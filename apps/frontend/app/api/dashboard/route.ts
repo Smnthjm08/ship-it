@@ -44,7 +44,7 @@ export async function GET(req: NextRequest) {
 
     const search = searchParams.get("query")?.trim() ?? "";
     const page = Number(searchParams.get("page") ?? "1");
-    const per_page = Number(searchParams.get("per_page") ?? "5");
+    const per_page = Number(searchParams.get("per_page") ?? "10");
 
     let repos: unknown[] = [];
 
@@ -99,9 +99,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({
       projects,
-      // github: gitHubInstallation,
       repos: cleanRepos,
-      // repos: []
     });
   } catch (error) {
     console.error("Error fetching dashboard details:", error);

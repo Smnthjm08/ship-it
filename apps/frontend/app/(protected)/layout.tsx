@@ -1,4 +1,6 @@
 import { Appbar } from "@/components/appbar";
+import { TooltipProvider } from "@/components/ui/tooltip";
+// import ProjectNavBar from "@/components/project-navbar";
 
 export default function ProtectedLayout({
   children,
@@ -7,8 +9,11 @@ export default function ProtectedLayout({
 }>) {
   return (
     <div className="flex flex-col min-h-screen">
-      <Appbar />
-      <main className="flex-1">{children}</main>
+      <TooltipProvider>
+        <Appbar />
+        {/* <ProjectNavBar /> */}
+        <main className="flex-1">{children}</main>
+      </TooltipProvider>
     </div>
   );
 }

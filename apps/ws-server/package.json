@@ -2,10 +2,11 @@
   "name": "ws-server",
   "version": "1.0.0",
   "main": "dist/index.js",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
     "build": "tsc -p tsconfig.json",
+    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
+    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
     "start": "node dist/index.js"
   },
   "keywords": [],
@@ -13,10 +14,14 @@
   "license": "ISC",
   "description": "",
   "devDependencies": {
+    "@types/ws": "^8.18.1",
     "@workspace/db": "workspace:*",
     "@workspace/eslint-config": "workspace:^",
     "@workspace/shared": "workspace:*",
     "@workspace/typescript-config": "workspace:*",
     "ts-node-dev": "^2.0.0"
+  },
+  "dependencies": {
+    "ws": "^8.18.3"
   }
 }

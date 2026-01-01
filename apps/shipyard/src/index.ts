@@ -1,49 +1,232 @@
 import { redisQueue } from "@workspace/shared/redis/queue";
 import { redisPub } from "@workspace/shared/redis/publisher";
-import prisma from "@workspace/db";
+import path from "path";
+import dotenv from "dotenv";
+import simpleGit from "simple-git";
+import fs from "fs";
+import { updateDeploymentStaus } from "./db-interactions";
+import Docker from "dockerode";
+import { PassThrough } from "stream";
+import { error } from "console";
+import { uploadToS3 } from "./s3-upload";
+import { getAllFiles } from "./file-utils";
+import mime from "mime-types";
+import { Account } from "./types";
+
+dotenv.config({ path: "../../.env" });
 
 async function startWorker() {
   while (true) {
-    console.log("starting shipyard...");
+    console.log("1. starting shipyard...");
 
     const job = await redisQueue.brPop("deployment-id", 0);
 
-    if (job) {
-      console.log("job from redis queue", job);
+    if (!job) continue;
 
-      const deploymentId = job?.element;
+    console.log("2. job from redis queue", job);
+    const deploymentId = job.element;
 
-      // TODO needs fix for here 
-      //       ReferenceError: exports is not defined
-      //     at file:///Users/smnthjm08/Desktop/ship-it/packages/db/src/generated/prisma/client.ts:48:23
-      //     at ModuleJobSync.runSync (node:internal/modules/esm/module_job:400:35)
-      //     at ModuleLoader.importSyncForRequire (node:internal/modules/esm/loader:427:47)
-      //     at loadESMFromCJS (node:internal/modules/cjs/loader:1565:24)
-      //     at Module.<anonymous> (node:internal/modules/cjs/loader:1716:5)
-      //     at Module._compile (/Users/smnthjm08/Desktop/ship-it/node_modules/.pnpm/source-map-support@0.5.21/node_modules/source-map-support/source-map-support.js:568:25)
-      //     at Module.m._compile (/private/tmp/ts-node-dev-hook-8800394743235367.js:69:33)
-      //     at loadTS (node:internal/modules/cjs/loader:1826:10)
-      //     at require.extensions.<computed> (/private/tmp/ts-node-dev-hook-8800394743235367.js:71:20)
-      //     at Object.nodeDevHook [as .ts] (/Users/smnthjm08/Desktop/ship-it/node_modules/.pnpm/ts-node-dev@2.0.0_@types+node@20.19.9_typescript@5.9.2/node_modules/ts-node-dev/lib/hook.js:63:13)
-      // [ERROR] 02:07:20 ReferenceError: exports is not defined
-      // const deployment = await prisma.deployment.update({
-      //   where: { id: deploymentId },
-      //   data: { status: "building" },
-      //   // include: {}
-      // });
+    const updatedDeployment = await updateDeploymentStaus({
+      deploymentId,
+      status: "building",
+    });
 
-      // console.log("deployment", deployment);
+    await redisPub.publish(`logs-${deploymentId}`, "Deployment Started...");
 
-      await redisPub.publish(`logs-${deploymentId}`, "Deployment Started...");
+    const githubAccount = updatedDeployment.project.user.accounts.find(
+      (acc: Account) => acc.providerId === "github",
+    );
 
-      // clone the repo
-      // install dependencies
-      // build
-      // upload build
-      // finish
+    if (!githubAccount?.accessToken) {
+      throw new Error("No GitHub OAuth access token found for this user.");
     }
 
-    return;
+    const githubToken = githubAccount.accessToken;
+
+    const appRoot = path.join(__dirname, "..");
+    const repoRoot = path.join(appRoot, "repositories");
+    const cloneDir = path.join(repoRoot, deploymentId);
+
+    if (!fs.existsSync(repoRoot)) {
+      fs.mkdirSync(repoRoot, { recursive: true });
+    }
+
+    if (fs.existsSync(cloneDir)) {
+      fs.rmSync(cloneDir, { recursive: true, force: true });
+    }
+
+    let repoUrl = updatedDeployment.project.repoUrl;
+
+    if (!repoUrl.endsWith(".git")) {
+      repoUrl += ".git";
+    }
+
+    const authedUrl = repoUrl.replace("https://", `https://${githubToken}@`);
+
+    console.log("Cloning:", repoUrl);
+
+    // await redisPub.publish(`logs-${deploymentId}`, `Cloning Started...`);
+
+    await redisPub.publish(`logs-${deploymentId}`, "Cloning repository...");
+
+    const git = simpleGit();
+
+    git.outputHandler((command, stdout, stderr) => {
+      stderr.on("data", (data) => {
+        const log = data.toString();
+
+        console.log(`[Git]: ${log}`);
+        redisPub.publish(`logs-${deploymentId}`, log);
+      });
+    });
+
+    await git.clone(authedUrl, cloneDir);
+
+    await redisPub.publish(`logs-${deploymentId}`, "Cloning repository...");
+
+    console.log("Cloned into:", cloneDir);
+
+    await redisPub.publish(
+      `logs-${deploymentId}`,
+      "Repository cloned successfully!",
+    );
+
+    const dockerConfig = {
+      socketPath: process.env.HOME + "/.docker/desktop/docker.sock",
+    };
+
+    const docker = new Docker(dockerConfig);
+
+    // console.log("docker", docker);
+
+    await redisPub.publish(`logs-${deploymentId}`, "docker started!");
+
+    try {
+      await docker.ping();
+      console.log("Docker connection established!");
+
+      const absolutePath = path.resolve(cloneDir);
+      console.log(`Mounting ${absolutePath} to /app`);
+
+      const buildStream = new PassThrough();
+
+      buildStream.on("data", (chunk) => {
+        const log = chunk.toString();
+        redisPub.publish(`logs-${deploymentId}`, log);
+      });
+
+      console.log("Starting Build...");
+
+      // 3. RUN: Create + Start + Attach + Wait
+      // docker run --rm -v /path:/app node:22-alpine sh -c "npm install && npm run build"
+
+      // const runResult = await docker.run(
+      //   "node:22-alpine",
+      //   ["/bin/sh", "-c", "npm install && npm run build"],
+      //   buildStream, // <--- Output goes here
+      //   // bas
+      //   {
+      //     HostConfig: {
+      //       Binds: [`${absolutePath}:/app`], // Volume Mount
+      //       AutoRemove: true,                 // Delete container when finished
+      //     },
+      //     WorkingDir: "/app",
+      //     // Base
+      //   }
+      // );
+
+      // docker.
+
+      // install dependencies and build
+      const runResult = await docker.run(
+        "node:22",
+        // pull
+        ["/bin/sh", "-c", "npm install && npm run build"],
+        buildStream,
+        {
+          HostConfig: {
+            Binds: [`${absolutePath}:/app`],
+            // pull: false,
+            // AutoRemove: true,
+          },
+          WorkingDir: "/app",
+          // pull: false
+        },
+      );
+
+      const streamData = runResult[0];
+      const statusCode = streamData.StatusCode;
+
+      if (statusCode === 0) {
+        console.log(`Build finished successfully!`);
+        await redisPub.publish(`logs-${deploymentId}`, "Build Complete!");
+
+        if (statusCode === 0) {
+          console.log(`Build Success!`);
+          await redisPub.publish(
+            `logs-${deploymentId}`,
+            "Build Complete! Starting Upload...",
+          );
+
+          // find the dist folder
+          const distFolder = path.join(cloneDir, "dist");
+
+          const allFiles = getAllFiles(distFolder);
+
+          for (const file of allFiles) {
+            // file = /Users/me/repo/dist/assets/script.js
+            // relativePath = assets/script.js
+            const relativePath = file
+              .slice(distFolder.length + 1)
+              .replace(/\\/g, "/");
+
+            // s3Key = 123xyz/assets/script.js
+            const s3Key = `${deploymentId}/${relativePath}`;
+
+            const contentType = mime.lookup(file) || "application/octet-stream";
+            const fileBuffer = fs.readFileSync(file);
+
+            await uploadToS3(s3Key, fileBuffer, contentType);
+
+            await redisPub.publish(
+              `logs-${deploymentId}`,
+              `Uploaded: ${relativePath}`,
+            );
+          }
+
+          console.log("Deployment Complete");
+          await redisPub.publish(
+            `logs-${deploymentId}`,
+            "Deployment Successful!",
+          );
+
+          console.log("Cleaning up local artifact...");
+          fs.rmSync(cloneDir, { recursive: true, force: true });
+          console.log("Cleanup finished.");
+
+          await updateDeploymentStaus({
+            deploymentId,
+            status: "completed",
+          });
+        } else {
+          console.error(`Build failed with code ${statusCode}`);
+          await redisPub.publish(
+            `logs-${deploymentId}`,
+            `Build Failed (Exit Code: ${statusCode})`,
+          );
+          await updateDeploymentStaus({ deploymentId, status: "failed" });
+        }
+      } else {
+        console.error(`Build failed with code ${statusCode}`, error);
+        await redisPub.publish(
+          `logs-${deploymentId}`,
+          `Build Failed (Exit Code: ${statusCode})`,
+        );
+      }
+    } catch (error) {
+      console.error("Docker Error:", error);
+      await redisPub.publish(`logs-${deploymentId}`, "Build failed to start.");
+    }
   }
 }
 

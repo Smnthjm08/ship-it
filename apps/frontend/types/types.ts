@@ -34,7 +34,7 @@ export interface Repo {
   visibility: "public" | "private";
   owner: string;
   description: string | null;
-  updatedAt: string; // ISO date string
+  updatedAt: string;
   size: number;
   defaultBranch: string;
   language: string | null;

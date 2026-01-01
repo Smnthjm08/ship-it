@@ -4,13 +4,14 @@
   "private": true,
   "scripts": {
     "build": "turbo build",
-    "dev": "turbo dev",
-    "start": "turbo start",
-    "lint": "turbo lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "clean": "turbo clean",
     "db:generate": "turbo db:generate",
+    "db:migrate": "turbo db:migrate",
+    "dev": "turbo dev",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "lint": "turbo lint",
     "postinstall": "turbo db:generate",
-    "db:migrate": "turbo db:migrate"
+    "start": "turbo start"
   },
   "devDependencies": {
     "@workspace/eslint-config": "workspace:*",
@@ -20,7 +21,7 @@
     "turbo": "^2.6.1",
     "typescript": "5.7.3"
   },
-  "packageManager": "pnpm@10.4.1",
+  "packageManager": "pnpm@10.24.0",
   "engines": {
     "node": ">=20"
   },

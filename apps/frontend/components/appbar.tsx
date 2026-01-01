@@ -1,10 +1,7 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
-import { signOut, useSession } from "@workspace/shared/auth/client";
-
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,8 +10,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
-import { LogOut, LogsIcon } from "lucide-react";
+import { LogOut, LogInIcon as LogsIcon } from "lucide-react";
 import Link from "next/link";
 import { ModeToggle } from "./mode-toggle";
 
@@ -28,17 +24,10 @@ function getInitials(name?: string | null) {
 }
 
 export function Appbar() {
-  const router = useRouter();
-  const { data: session } = useSession();
-
-  const handleLogout = async () => {
-    await signOut();
-    toast.success("Logged out successfully.");
-    router.push("/");
-  };
+  const userInitials = getInitials("John Doe");
 
   return (
-    <header className="flex sticky items-center justify-between px-8 py-4 border-b-2 border-dashed border-gray-600 h-16">
+    <header className="flex sticky items-center justify-between px-8 py-4 border-b border-border h-16">
       <Link href="/dashboard">
         <div className="flex gap-2 items-center">
           <LogsIcon width={20} height={20} />
@@ -53,42 +42,25 @@ export function Appbar() {
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="h-9 w-9 rounded-full p-0">
               <Avatar className="h-8 w-8">
-                {session?.user?.image !== null ? (
-                  <AvatarImage
-                    src={session?.user?.image}
-                    alt={session?.user?.name ?? "User"}
-                  />
-                ) : (
-                  <AvatarFallback>
-                    {getInitials(session?.user?.name)}
-                  </AvatarFallback>
-                )}
+                <AvatarFallback>{userInitials}</AvatarFallback>
               </Avatar>
             </Button>
           </DropdownMenuTrigger>
 
           <DropdownMenuContent className="w-48" align="end">
             <DropdownMenuLabel className="font-normal">
-              <p className="text-sm font-medium">{session?.user?.name}</p>
-              <p className="text-xs text-muted-foreground">
-                {session?.user?.email}
-              </p>
+              <p className="text-sm font-medium">John Doe</p>
+              <p className="text-xs text-muted-foreground">john@example.com</p>
             </DropdownMenuLabel>
 
             <DropdownMenuSeparator />
 
-            <DropdownMenuItem
-              onClick={() => router.push("/profile")}
-              className="cursor-pointer"
-            >
+            <DropdownMenuItem className="cursor-pointer">
               Profile
             </DropdownMenuItem>
 
             <DropdownMenuSeparator />
-            <DropdownMenuItem
-              onClick={handleLogout}
-              className="cursor-pointer text-red-500 font-semibold"
-            >
+            <DropdownMenuItem className="cursor-pointer text-red-500 font-semibold">
               <LogOut className="mr-2 h-4 w-4 text-red-500" />
               Logout
             </DropdownMenuItem>

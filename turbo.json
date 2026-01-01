@@ -7,33 +7,31 @@
     "BETTER_AUTH_URL",
     "BETTER_AUTH_SECRET",
     "NEXT_PUBLIC_APP_URL",
-    "REDIS_URL"
+    "GITHUB_CLIENT_ID",
+    "GITHUB_CLIENT_SECRET",
+    "REDIS_URL",
+    "AWS_ACCESS_KEY_ID",
+    "AWS_SECRET_ACCESS_KEY",
+    "AWS_S3_BUCKET_NAME",
+    "AWS_S3_REGION"
   ],
   "tasks": {
     "build": {
-      "dependsOn": [
-        "^build"
-      ],
-      "inputs": [
-        "$TURBO_DEFAULT$",
-        ".env*"
-      ],
-      "outputs": [
-        ".next/**",
-        "!.next/cache/**",
-        "dist"
-      ]
+      "dependsOn": ["^build"],
+      "inputs": ["$TURBO_DEFAULT$", ".env*"],
+      "outputs": [".next/**", "!.next/cache/**", "dist/**"]
     },
-    "start": {},
+    "clean": {
+      "cache": false
+    },
+    "start": {
+      "dependsOn": ["^build"]
+    },
     "lint": {
-      "dependsOn": [
-        "^lint"
-      ]
+      "dependsOn": ["^lint"]
     },
     "check-types": {
-      "dependsOn": [
-        "^check-types"
-      ]
+      "dependsOn": ["^check-types"]
     },
     "dev": {
       "cache": false,
