@@ -25,6 +25,5 @@
     "node": ">=18"
   },
   "dependencies": {
-    "better-auth": "^1.4.10"
   }
 }

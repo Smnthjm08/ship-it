@@ -8,7 +8,7 @@
     "db:migrate": "drizzle-kit migrate",
     "db:pull": "drizzle-kit pull",
     "db:push": "drizzle-kit push",
-    "db:studio": "drizzle-kit studio",
+    "db:studio": "drizzle-kit studio --port 5555 --verbose",
     "db:up": "drizzle-kit up",
     "dev": "tsc --watch",
     "build": "tsc"

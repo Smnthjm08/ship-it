@@ -8,5 +8,17 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": ""
+  "description": "",
+  "dependencies": {
+    "better-auth": "^1.4.10"
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "@repo/db": "workspace:*"
+  },
+  "exports": {
+    "./auth": "./src/auth.ts",
+    "./client": "./src/client.ts"
+  }
 }

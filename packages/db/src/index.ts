@@ -1,3 +1,3 @@
 export * from "./database";
-export * from "./schema";
+export * from "./schemas/auth-schema";
 export * from "./types";
