@@ -92,6 +92,7 @@ import {
   FileTextIcon,
   LogOutIcon,
 } from "lucide-react";
+import Image from "next/image";
 
 export function ComponentExample() {
   return (
@@ -110,6 +111,7 @@ function CardExample() {
         <img
           src="https://images.unsplash.com/photo-1604076850742-4c7221f3101b?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
           alt="Photo by mymind on Unsplash"
+          // width={""}
           title="Photo by mymind on Unsplash"
           className="relative z-20 aspect-video w-full object-cover brightness-60 grayscale"
         />
