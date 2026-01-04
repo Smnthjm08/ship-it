@@ -1,17 +1,18 @@
 import { betterAuth } from "better-auth";
-import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { db } from "@repo/db"; // your drizzle instance
+import { prismaAdapter } from "better-auth/adapters/prisma";
+import { prisma } from '@repo/db';
 
-console.log("db in auth.ts", db);
+// console.log("db in auth.ts", db);
 
 export const auth = betterAuth({
-  database: drizzleAdapter(db, {
-    provider: "pg", // or "mysql", "sqlite"
+  database: prismaAdapter(prisma, {
+    provider: "postgresql", // or "mysql", "sqlite"
   }),
   socialProviders: {
     github: {
       clientId: process.env.GITHUB_CLIENT_ID as string,
       clientSecret: process.env.GITHUB_CLIENT_SECRET as string,
+      scope: ["repo"],
     },
   },
 });

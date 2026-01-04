@@ -1,35 +1,30 @@
 {
   "name": "@repo/db",
   "version": "1.0.0",
-  "main": "dist/index.js",
+  "main": "",
+  "type": "module",
   "scripts": {
-    "db:check": "drizzle-kit check",
-    "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate",
-    "db:pull": "drizzle-kit pull",
-    "db:push": "drizzle-kit push",
-    "db:studio": "drizzle-kit studio --port 5555 --verbose",
-    "db:up": "drizzle-kit up",
-    "dev": "tsc --watch",
-    "build": "tsc"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "db:migrate": "prisma migrate dev",
+    "db:reset": "prisma migrate reset",
+    "db:push": "prisma db push",
+    "db:studio": "prisma studio"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
-  "dependencies": {
-    "dotenv": "^17.2.3",
-    "drizzle-orm": "^0.45.1",
-    "pg": "^8.16.3",
-    "postgres": "^3.4.7"
-  },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
+    "@types/node": "25.0.3",
     "@types/pg": "^8.16.0",
-    "drizzle-kit": "^0.31.8",
-    "tsx": "^4.21.0",
-    "typescript": "^5.9.3"
+    "prisma": "^7.2.0"
+  },
+  "dependencies": {
+    "@prisma/adapter-pg": "^7.2.0",
+    "@prisma/client": "^7.2.0",
+    "pg": "^8.16.3"
   },
   "exports": {
     ".": "./src/index.ts"

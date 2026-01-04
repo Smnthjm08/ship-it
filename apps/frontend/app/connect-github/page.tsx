@@ -17,8 +17,6 @@ import { cn } from "@/lib/utils";
 export default function SignIn() {
   const [loading, setLoading] = useState(false);
 
-  console.log("cc", process.env.DATABASE_URL);
-
   return (
     <main className="flex items-center min-h-screen flex-row justify-center">
       <Card className="min-w-md text-center">
