@@ -3,17 +3,17 @@
   "private": true,
   "scripts": {
     "build": "turbo run build",
-    "start": "turbo run start",
-    "dev": "turbo run dev",
-    "lint": "turbo run lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "check-types": "turbo run check-types",
     "db:migrate": "turbo run migrate dev",
-    "db:reset": "turbo run migrate reset",
     "db:push": "turbo run db push",
+    "db:reset": "turbo run migrate reset",
     "db:studio": "turbo run studio",
+    "dev": "turbo run dev",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "lint": "turbo run lint",
     "generate": "turbo run generate",
-    "postinstall": "pnpm --filter @repo/db run db:generate"
+    "postinstall": "pnpm --filter @repo/db run db:generate",
+    "start": "turbo run start"
   },
   "devDependencies": {
     "prettier": "^3.7.4",

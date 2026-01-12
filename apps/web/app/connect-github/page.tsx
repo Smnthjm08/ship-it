@@ -14,14 +14,14 @@ import { signIn } from "@repo/auth/client";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
-export default function SignIn() {
+export default function ConnectGithubPage() {
   const [loading, setLoading] = useState(false);
 
   return (
     <main className="flex items-center min-h-screen flex-row justify-center">
       <Card className="min-w-md text-center">
         <CardHeader>
-          <CardTitle className="text-lg md:text-xl">Sign In</CardTitle>
+          <CardTitle className="text-lg md:text-xl">Connect Github</CardTitle>
           <CardDescription className="text-xs md:text-sm">
             Connect your GitHub account to get started
           </CardDescription>
