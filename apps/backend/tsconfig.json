@@ -2,10 +2,10 @@
   "extends": "@repo/typescript-config/base.json",
   "compilerOptions": {
     "outDir": "./dist",
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
-    "target": "ES2022",
-    "verbatimModuleSyntax": true
+    "module": "NodeNext",           // Changed from ESNext
+    "moduleResolution": "NodeNext",  // Changed from Bundler
+    "target": "ES2022"
+    // Remove verbatimModuleSyntax if present
   },
   "include": ["src"],
   "exclude": ["node_modules"]

@@ -26,7 +26,7 @@ import {
 
 export function ProfileView() {
   const { user } = useAuth();
-  
+
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     name: user?.name || "",
@@ -68,7 +68,11 @@ export function ProfileView() {
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold">Profile</h1>
         {!isEditing && (
-          <Button onClick={() => setIsEditing(true)} variant="outline" size="sm">
+          <Button
+            onClick={() => setIsEditing(true)}
+            variant="outline"
+            size="sm"
+          >
             <Pencil className="mr-2 h-4 w-4" />
             Edit
           </Button>
