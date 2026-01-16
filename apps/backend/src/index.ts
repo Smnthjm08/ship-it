@@ -1,6 +1,6 @@
 import express, { Router, Request, Response, NextFunction } from "express";
 import morgan from "morgan";
-import projectRoutes from "./routes/projects.routes.js";
+import projectRoutes from "./routes/projects.routes";
 
 const app = express();
 
@@ -10,6 +10,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 const v1Router = Router();
+
+app.get("/", (req: Request, res: Response) => {
+  res.json({message: "Welcome to the Backend API"});
+});
 
 app.use("/api/v1", v1Router);
 

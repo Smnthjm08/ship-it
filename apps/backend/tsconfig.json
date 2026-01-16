@@ -1,12 +1,20 @@
 {
   "extends": "@repo/typescript-config/base.json",
   "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "declaration": true,
+    "esModuleInterop": true,
+    "incremental": true,
+    "lib": ["ES2022", "DOM"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
     "outDir": "./dist",
-    "module": "NodeNext",           // Changed from ESNext
-    "moduleResolution": "NodeNext",  // Changed from Bundler
-    "target": "ES2022"
-    // Remove verbatimModuleSyntax if present
+    "removeComments": true,
+    "resolveJsonModule": true,
+    "sourceMap": true,
+    "target": "ES2022",
+    "skipLibCheck": true,
   },
-  "include": ["src"],
-  "exclude": ["node_modules"]
+  "include": ["src/**/*", "packages/*", "emails/**/*"],
+  "exclude": ["node_modules", "dist"]
 }
