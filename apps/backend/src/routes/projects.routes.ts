@@ -1,5 +1,11 @@
 import { Router } from "express";
-import { createProjectController, deleteProjectController, getAllProjectsController, getProjectByIdController, updateProjectController } from "../controllers/projects.controller";
+import {
+  createProjectController,
+  deleteProjectController,
+  getAllProjectsController,
+  getProjectByIdController,
+  updateProjectController,
+} from "../controllers/projects.controller";
 
 const projectsRoutes: Router = Router();
 

@@ -13,9 +13,11 @@
     "lint": "turbo run lint",
     "generate": "turbo run generate",
     "postinstall": "pnpm --filter @repo/db run db:generate",
-    "start": "turbo run start"
+    "start": "turbo run start",
+    "prepare": "husky"
   },
   "devDependencies": {
+    "husky": "^9.1.7",
     "prettier": "^3.7.4",
     "turbo": "^2.7.3",
     "typescript": "5.9.2"

@@ -16,9 +16,11 @@ import { useAuth } from "@/components/auth-provider";
 import { ThemeToggle } from "./theme-toggle";
 import Logo from "./utils/logo";
 import { authClient } from "@repo/auth/client";
+import { useRouter } from "next/navigation";
 
 export function Navbar() {
   const { user, isAuthenticated } = useAuth();
+  const router = useRouter();
 
   const getInitials = (name: string) => {
     return name
@@ -27,6 +29,11 @@ export function Navbar() {
       .join("")
       .toUpperCase()
       .slice(0, 2);
+  };
+
+  const handleSignOut = () => {
+    authClient.signOut();
+    router.push("/connect-github");
   };
 
   return (
@@ -79,7 +86,7 @@ export function Navbar() {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   className="cursor-pointer text-red-600"
-                  onClick={() => authClient.signOut()}
+                  onClick={() => handleSignOut()}
                 >
                   <LogOut className="mr-2 h-4 w-4" />
                   Log out

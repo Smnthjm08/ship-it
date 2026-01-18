@@ -4,7 +4,6 @@ import { Input } from "@/components/ui/input";
 import { getServerAxios } from "@/lib/axios-instance";
 
 export default async function NewProjectPage() {
-
   const axiosInstance = await getServerAxios();
   const projects = await axiosInstance.get("/new");
   console.log("projects", projects);

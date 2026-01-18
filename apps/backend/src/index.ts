@@ -1,4 +1,10 @@
-import express, { Router, Request, Response, NextFunction } from "express";
+import express, {
+  Router,
+  Request,
+  Response,
+  NextFunction,
+  Application,
+} from "express";
 import morgan from "morgan";
 import cors from "cors";
 import cookieParser from "cookie-parser";
@@ -9,7 +15,7 @@ import authMiddleware from "./middlewares/auth.middleware";
 import projectRoutes from "./routes/projects.routes";
 import { newProjectController } from "./controllers/new-project.controller";
 
-const app = express();
+const app: Application = express();
 
 const allowedOrigins = [process.env.BETTER_AUTH_URL!];
 
@@ -59,6 +65,12 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   });
 });
 
-app.listen(3002, () => {
-  console.log("Server is running on http://localhost:3002");
-});
+const port = process.env.PORT || 3002;
+
+if (process.env.NODE_ENV !== "production") {
+  app.listen(port, () => {
+    console.log(`Server is running on http://localhost:${port}`);
+  });
+}
+
+export default app;

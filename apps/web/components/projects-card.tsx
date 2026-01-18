@@ -11,18 +11,20 @@ import { Button } from "@/components/ui/button";
 import { GitBranch, Github, Calendar } from "lucide-react";
 import Link from "next/link";
 
+export interface ProjectTypes {
+  id: string;
+  name: string;
+  repoUrl: string;
+  owner: string;
+  repoName: string;
+  branch: string;
+  framework?: string | null;
+  createdAt: Date;
+  deployments?: { id: string; status?: string }[];
+};
+
 interface ProjectsCardProps {
-  project: {
-    id: string;
-    name: string;
-    repoUrl: string;
-    owner: string;
-    repoName: string;
-    branch: string;
-    framework?: string | null;
-    createdAt: Date;
-    deployments?: { id: string; status?: string }[];
-  };
+  project: ProjectTypes;
 }
 
 export default function ProjectsCard({ project }: ProjectsCardProps) {
