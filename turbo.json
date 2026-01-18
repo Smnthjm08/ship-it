@@ -8,28 +8,31 @@
     "GITHUB_CLIENT_ID",
     "GITHUB_CLIENT_SECRET",
     "NODE_ENV",
-    "API_BASE_URL"
+    "NEXT_PUBLIC_API_BASE_URL"
   ],
   "tasks": {
     "build": {
-      "dependsOn": ["^build", "^generate"],
-      "inputs": ["$TURBO_DEFAULT$", ".env*"],
+      "dependsOn": [
+        "^build",
+        "^generate"
+      ],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        ".env*"
+      ],
       "outputs": [
         ".next/**",
         "!.next/cache/**",
         "dist/**"
       ]
     },
-
     "generate": {
       "cache": false
     },
-
     "dev": {
       "cache": false,
       "persistent": true
     },
-
     "start": {
       "cache": false,
       "persistent": true
@@ -38,13 +41,15 @@
       "cache": false,
       "persistent": true
     },
-
     "lint": {
-      "dependsOn": ["^lint"]
+      "dependsOn": [
+        "^lint"
+      ]
     },
-
     "check-types": {
-      "dependsOn": ["^check-types"]
+      "dependsOn": [
+        "^check-types"
+      ]
     }
   }
 }

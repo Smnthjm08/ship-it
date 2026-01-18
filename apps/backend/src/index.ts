@@ -7,10 +7,11 @@ import { auth } from "@repo/auth/server";
 
 import authMiddleware from "./middlewares/auth.middleware";
 import projectRoutes from "./routes/projects.routes";
+import { newProjectController } from "./controllers/new-project.controller";
 
 const app = express();
 
-const allowedOrigins = ["http://localhost:3000"];
+const allowedOrigins = [process.env.BETTER_AUTH_URL!];
 
 app.use(
   cors({
@@ -40,7 +41,7 @@ v1Router.get("/health", (req: Request, res: Response) => {
 });
 
 v1Router.use("/projects", authMiddleware, projectRoutes);
-v1Router.use("/new", authMiddleware, projectRoutes);
+v1Router.use("/new", authMiddleware, newProjectController);
 // v1Router.use("/dashboard", authMiddleware, dashboardRoutes);
 
 app.use((req: Request, res: Response) => {

@@ -69,18 +69,26 @@ model Verification {
   @@map("verification")
 }
 
+enum Framework {
+  NEXTJS
+  REACT
+  VITE
+  NODE
+  NONE
+}
+
 model Project {
-  id             String  @id @default(cuid())
+  id             String     @id @default(cuid())
   name           String
   repoUrl        String
   owner          String
   repoName       String
-  branch         String  @default("main")
-  framework      String?
+  branch         String     @default("main")
+  framework      Framework? @default(NONE)
   buildCommand   String?
   outputDir      String?
-  rootDir        String? @default("./")
-  installCommand String? @default("npm install")
+  rootDir        String?    @default("./")
+  installCommand String?    @default("npm run install")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -107,10 +115,10 @@ model Deployment {
   createdAt DateTime         @default(now())
   updatedAt DateTime         @updatedAt
 
-  project Project @relation(fields: [projectId], references: [id])
+  project Project         @relation(fields: [projectId], references: [id])
   logs    DeploymentLog[]
 
-    @@map("deployment")
+  @@map("deployment")
 }
 
 model DeploymentLog {

@@ -2,7 +2,6 @@ import { projectsService } from "../services/projects.service";
 
 export const getAllProjectsController = async (req: any, res: any) => {
   try {
-    console.log("Fetching projects for user:", req.user);
     const projects = await projectsService.getProjects(req.user.id);
     res.status(200).json({
       message: "Projects fetched successfully",

@@ -1,12 +1,12 @@
 import axios from "axios";
 
-if (!process.env.API_BASE_URL) {
-  throw new Error("API_BASE_URL is not defined in environment variables");
+if (!process.env.NEXT_PUBLIC_API_BASE_URL) {
+  throw new Error("NEXT_PUBLIC_API_BASE_URL is not defined in environment variables");
 }
 
 // Use this for Client Components
 export const clientAxios = axios.create({
-  baseURL: process.env.API_BASE_URL,
+  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
   withCredentials: true,
 });
 
@@ -17,7 +17,7 @@ export const getServerAxios = async () => {
   const cookie = headersList.get("cookie");
 
   return axios.create({
-    baseURL: process.env.API_BASE_URL,
+    baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
     headers: {
       Cookie: cookie || "",
     },
