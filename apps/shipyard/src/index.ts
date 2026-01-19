@@ -1,1 +1,3 @@
-console.log("Shipyard");
+while (true) {
+    console.log("Hello World");
+}

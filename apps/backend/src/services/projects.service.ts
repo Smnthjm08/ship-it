@@ -23,7 +23,20 @@ export class ProjectsService {
   }
 
   async createProject(data: any, userId: string) {
-    return await prisma.project.create({ data: { ...data, userId } });
+    return await prisma.project.create({
+      data: {
+        ...data,
+        userId,
+        deployments: {
+          create: {
+            status: "queued",
+          },
+        },
+      },
+      include: {
+        deployments: true,
+      },
+    });
   }
 
   async updateProject(userId: string, id: string, data: any) {
