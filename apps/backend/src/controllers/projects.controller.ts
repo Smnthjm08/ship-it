@@ -1,4 +1,5 @@
 import { projectsService } from "../services/projects.service";
+import { redisPub, redisQueue } from "@repo/shared";
 
 export const getAllProjectsController = async (req: any, res: any) => {
   try {
@@ -35,10 +36,14 @@ export const createProjectController = async (req: any, res: any) => {
       req.body,
       req.user.id,
     );
+
+    await redisQueue.lPush("deployments", JSON.stringify(newProject?.deployments?.[0]));
+
     res.status(201).json({
       message: "Project created successfully",
       data: newProject,
       error: null,
+      res: newProject?.deployments?.[0],
     });
   } catch (error) {
     console.error("Error creating project:", error);

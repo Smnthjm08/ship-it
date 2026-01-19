@@ -21,7 +21,7 @@ export interface ProjectTypes {
   framework?: string | null;
   createdAt: Date;
   deployments?: { id: string; status?: string }[];
-};
+}
 
 interface ProjectsCardProps {
   project: ProjectTypes;

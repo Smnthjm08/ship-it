@@ -33,11 +33,11 @@ export default function CreateNewProjectForm() {
 
   if (!owner || !repo || !repoUrl) {
     return (
-      <main className="flex min-h-screen items-center justify-center">
+      <div className="flex flex-1 items-center justify-center">
         <p className="text-xl text-muted-foreground">
           Invalid GitHub import link
         </p>
-      </main>
+      </div>
     );
   }
 
@@ -77,7 +77,6 @@ export default function CreateNewProjectForm() {
         buildCommand: buildCommand,
       });
 
-      console.log("response", response);
       if (response.status === 201) {
         toast.success("Project created successfully");
         router.push(`/projects/${response.data.data.id}`);
@@ -88,12 +87,12 @@ export default function CreateNewProjectForm() {
   };
 
   return (
-    <main className="h-screen overflow-hidden flex justify-center text-start">
-      <div className="w-full max-w-md h-full overflow-auto px-6 py-12">
+    <div className="flex flex-1 justify-center text-start">
+      <div className="w-full max-w-md px-6 py-12 h-fit">
         <form className="space-y-3" onSubmit={handleSubmit}>
           <FieldSet>
-            <FieldLegend className="text-2xl font-bold">
-              New Project
+            <FieldLegend>
+              <span className="text-2xl font-bold">New Project</span>
             </FieldLegend>
             <FieldDescription className="text-muted-foreground">
               Import your project from GitHub
@@ -192,6 +191,6 @@ export default function CreateNewProjectForm() {
           <Button type="submit">Create Project</Button>
         </form>
       </div>
-    </main>
+    </div>
   );
 }

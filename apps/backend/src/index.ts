@@ -14,6 +14,9 @@ import { auth } from "@repo/auth/server";
 import authMiddleware from "./middlewares/auth.middleware";
 import projectRoutes from "./routes/projects.routes";
 import { newProjectController } from "./controllers/new-project.controller";
+import { connectRedis } from "@repo/shared";
+
+connectRedis().catch((err) => console.error("Failed to connect to Redis:", err));
 
 const app: Application = express();
 

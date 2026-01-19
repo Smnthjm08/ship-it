@@ -1,0 +1,27 @@
+{
+  "name": "@repo/shared",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "devDependencies": {
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*"
+  },
+  "dependencies": {
+    "redis": "^5.10.0"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./redis/client": "./src/redis/client.ts",
+    "./redis/publisher": "./src/redis/publisher.ts",
+    "./redis/queue": "./src/redis/queue.ts",
+    "./redis/subscriber": "./src/redis/subscriber.ts"
+  }
+}

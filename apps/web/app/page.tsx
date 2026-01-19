@@ -16,7 +16,6 @@ export default async function HomePage() {
 
   const axiosInstance = await getServerAxios();
   const projects = await axiosInstance.get("/projects");
-  console.log("projects", projects?.data?.data);
 
   if (session) {
     return (

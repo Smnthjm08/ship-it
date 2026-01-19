@@ -52,8 +52,10 @@ export default async function RootLayout({
           disableTransitionOnChange
         >
           <AuthProvider user={session?.user || null}>
-            <Navbar />
-            {children}
+            <div className="flex flex-col min-h-screen">
+              <Navbar />
+              {children}
+            </div>
             <Toaster />
           </AuthProvider>
         </ThemeProvider>
