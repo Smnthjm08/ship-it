@@ -7,4 +7,3 @@ export type RedisClient = any;
 export const redis: any = client;
 
 redis.on("error", (err: any) => console.error("redis client error:", err));
-

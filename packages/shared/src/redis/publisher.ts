@@ -3,5 +3,6 @@ import { redisConfig } from "./config.js";
 
 export const redisPub: any = createClient(redisConfig);
 
-redisPub.on("error", (err: any) => console.error("redis publisher error::", err));
-
+redisPub.on("error", (err: any) =>
+  console.error("redis publisher error::", err),
+);

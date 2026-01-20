@@ -16,7 +16,9 @@ import projectRoutes from "./routes/projects.routes";
 import { newProjectController } from "./controllers/new-project.controller";
 import { connectRedis } from "@repo/shared";
 
-connectRedis().catch((err) => console.error("Failed to connect to Redis:", err));
+connectRedis().catch((err) =>
+  console.error("Failed to connect to Redis:", err),
+);
 
 const app: Application = express();
 

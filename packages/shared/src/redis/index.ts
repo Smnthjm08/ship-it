@@ -10,13 +10,13 @@ const clients = [redis, redisPub, redisSub, redisQueue];
  * This should be called during application startup.
  */
 export async function connectRedis() {
-    await Promise.all(
-        clients.map(async (client) => {
-            if (!client.isOpen) {
-                await client.connect();
-            }
-        })
-    );
+  await Promise.all(
+    clients.map(async (client) => {
+      if (!client.isOpen) {
+        await client.connect();
+      }
+    }),
+  );
 }
 
 /**
@@ -24,13 +24,13 @@ export async function connectRedis() {
  * This should be called during application shutdown.
  */
 export async function disconnectRedis() {
-    await Promise.all(
-        clients.map(async (client) => {
-            if (client.isOpen) {
-                await client.quit();
-            }
-        })
-    );
+  await Promise.all(
+    clients.map(async (client) => {
+      if (client.isOpen) {
+        await client.quit();
+      }
+    }),
+  );
 }
 
 export * from "./client.js";
