@@ -6,7 +6,6 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import {
-  ArrowLeft,
   ExternalLink,
   LayoutDashboard,
   Layers,
@@ -243,23 +242,13 @@ function ProjectSidebar({
   return (
     <>
       <SidebarHeader>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            {/* The escape hatch comes first — always know how to get out. */}
-            <SidebarMenuButton asChild tooltip="All projects" size="sm">
-              <Link href="/projects" className="text-muted-foreground">
-                <ArrowLeft />
-                <span>All projects</span>
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
-
-        <div className="flex items-center gap-2 px-2 py-1.5 group-data-[collapsible=icon]:hidden">
+        {/* No back link here: the header breadcrumb's "Projects" crumb is the
+            escape hatch, and two of them in the same corner is noise. */}
+        <div className="flex items-center gap-2 px-2 py-1.5">
           <div className="bg-primary text-primary-foreground flex aspect-square size-7 shrink-0 items-center justify-center rounded-md text-xs font-semibold">
             {project?.name?.[0]?.toUpperCase() ?? "·"}
           </div>
-          <span className="truncate text-sm font-semibold">
+          <span className="truncate text-sm font-semibold group-data-[collapsible=icon]:hidden">
             {project?.name ?? "Loading…"}
           </span>
         </div>

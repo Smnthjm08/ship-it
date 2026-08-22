@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Manrope, JetBrains_Mono } from "next/font/google";
+import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
@@ -10,11 +10,12 @@ import { AuthProvider } from "@/components/providers/auth-provider";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AppShell } from "@/components/globals/app-shell";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
-
-const manrope = Manrope({
+// DESIGN.md runs one typeface: Inter carries display and body alike, split by
+// weight and tracking rather than by family. --font-display therefore points at
+// Inter too, so .font-display keeps working without loading a second face.
+const inter = Inter({
   subsets: ["latin"],
-  variable: "--font-display",
+  variable: "--font-sans",
 });
 
 const jetbrainsMono = JetBrains_Mono({
@@ -44,7 +45,7 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <body
-        className={`${manrope.variable} ${jetbrainsMono.variable} antialiased`}
+        className={`${jetbrainsMono.variable} antialiased`}
       >
         <TooltipProvider>
           <ThemeProvider

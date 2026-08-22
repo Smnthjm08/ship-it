@@ -8,7 +8,7 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-sans);
-  --font-display: var(--font-display);
+  --font-display: var(--font-sans);
   --font-mono: var(--font-mono);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
@@ -40,8 +40,9 @@
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
 
-  /* Cal.com-style surface + badge tokens (DESIGN.md) */
+  /* Expo-derived surface + accent tokens (DESIGN.md) */
   --color-canvas: var(--canvas);
+  --color-canvas-soft: var(--canvas-soft);
   --color-surface-soft: var(--surface-soft);
   --color-surface-card: var(--surface-card);
   --color-surface-strong: var(--surface-strong);
@@ -49,6 +50,7 @@
   --color-surface-dark-elevated: var(--surface-dark-elevated);
   --color-hairline: var(--hairline);
   --color-hairline-soft: var(--hairline-soft);
+  --color-hairline-strong: var(--hairline-strong);
   --color-ink: var(--ink);
   --color-body-text: var(--body-text);
   --color-muted-text: var(--muted-text);
@@ -57,22 +59,23 @@
   --color-on-dark: var(--on-dark);
   --color-on-dark-soft: var(--on-dark-soft);
   --color-brand-accent: var(--brand-accent);
-  --color-badge-orange: var(--badge-orange);
-  --color-badge-pink: var(--badge-pink);
-  --color-badge-violet: var(--badge-violet);
-  --color-badge-emerald: var(--badge-emerald);
+  --color-text-link-secondary: var(--text-link-secondary);
+  --color-accent-preview: var(--accent-preview);
+  --color-accent-link-bright: var(--accent-link-bright);
+  --color-gradient-sky-light: var(--gradient-sky-light);
+  --color-gradient-sky-mid: var(--gradient-sky-mid);
   --color-success: var(--success);
   --color-warning: var(--warning);
   --color-error: var(--error);
+  --color-error-soft: var(--error-soft);
 
+  --radius-none: 0px;
   --radius-xs: 4px;
   --radius-sm: 6px;
   --radius-md: 8px;
   --radius-lg: 12px;
   --radius-xl: 16px;
-  --radius-2xl: 20px;
-  --radius-3xl: 24px;
-  --radius-4xl: 28px;
+  --radius-2xl: 24px;
   --radius-pill: 9999px;
   --radius-full: 9999px;
 
@@ -84,34 +87,44 @@
 :root {
   /* Surfaces */
   --canvas: #ffffff;
-  --surface-soft: #f8f9fa;
-  --surface-card: #f5f5f5;
-  --surface-strong: #e5e7eb;
-  --surface-dark: #101010;
+  --canvas-soft: #fafafa;
+  --surface-soft: #fafafa;
+  /* Expo's cards are white and delimited by a hairline, not by a grey fill. */
+  --surface-card: #ffffff;
+  --surface-strong: #f0f0f3;
+  --surface-dark: #171717;
   --surface-dark-elevated: #1a1a1a;
-  --hairline: #e5e7eb;
-  --hairline-soft: #f3f4f6;
+  --hairline: #f0f0f3;
+  --hairline-soft: #f5f5f7;
+  --hairline-strong: #dcdee0;
 
   /* Text */
-  --ink: #111111;
-  --body-text: #374151;
-  --muted-text: #6b7280;
-  --muted-soft: #898989;
+  --ink: #171717;
+  --body-text: #60646c;
+  --muted-text: #999999;
+  --muted-soft: #cccccc;
   --on-primary: #ffffff;
   --on-dark: #ffffff;
-  --on-dark-soft: #a1a1aa;
+  --on-dark-soft: #b0b4ba;
 
-  /* Brand & accent */
-  --brand-accent: #3b82f6;
-  --badge-orange: #fb923c;
-  --badge-pink: #ec4899;
-  --badge-violet: #8b5cf6;
-  --badge-emerald: #34d399;
+  /* Brand & accent. The blue is a *link* colour — it never carries selection,
+     status, or a primary action. Primary is pure black. */
+  --brand-accent: #0d74ce;
+  --text-link-secondary: #476cff;
+  --accent-preview: #8145b5;
+  --accent-link-bright: #47c2ff;
+  --gradient-sky-light: #cfe7ff;
+  --gradient-sky-mid: #a8c8e8;
 
-  /* Semantic */
-  --success: #10b981;
-  --warning: #f59e0b;
+  /* Semantic. These are the only hues that carry meaning in the product — a
+     deployment's state is the one thing colour is spent on, so they must stay
+     legible on both canvases rather than matching the marketing site exactly.
+     DESIGN.md's semantic-error (#eb8e90) is a fill tint at 2.3:1 on white; it
+     lives on as --error-soft and a readable red carries text and dots. */
+  --success: #16a34a;
+  --warning: #ab6400;
   --error: #ef4444;
+  --error-soft: #eb8e90;
 
   /* shadcn mapping */
   --background: var(--canvas);
@@ -120,82 +133,98 @@
   --card-foreground: var(--ink);
   --popover: var(--canvas);
   --popover-foreground: var(--ink);
-  --primary: #111111;
-  --primary-active: #242424;
+  --primary: #000000;
+  --primary-active: #1a1a1a;
   --primary-foreground: var(--on-primary);
-  --secondary: var(--surface-card);
+  /* --secondary/--muted/--accent are fills, so they resolve to --surface-strong
+     rather than --surface-card: the card token is now pure white and a fill
+     equal to the canvas renders as no fill at all. */
+  --secondary: var(--surface-strong);
   --secondary-foreground: var(--ink);
-  --muted: var(--surface-card);
+  --muted: var(--surface-strong);
   --muted-foreground: var(--muted-text);
-  --accent: var(--surface-soft);
+  --accent: var(--surface-strong);
   --accent-foreground: var(--ink);
   --destructive: var(--error);
   --border: var(--hairline);
-  --input: var(--hairline);
+  --input: var(--hairline-strong);
   --ring: var(--ink);
   --chart-1: var(--brand-accent);
-  --chart-2: var(--badge-violet);
-  --chart-3: var(--badge-emerald);
-  --chart-4: var(--badge-orange);
-  --chart-5: var(--badge-pink);
+  --chart-2: var(--accent-preview);
+  --chart-3: var(--success);
+  --chart-4: var(--warning);
+  --chart-5: var(--accent-link-bright);
   --radius: 0.5rem;
-  --sidebar: var(--surface-soft);
+  --sidebar: var(--canvas-soft);
   --sidebar-foreground: var(--ink);
   --sidebar-primary: var(--primary);
   --sidebar-primary-foreground: var(--on-primary);
   /* Must not resolve to the same value as --sidebar: shadcn's hover and
      active states are both `bg-sidebar-accent`, so a matching value renders
-     them invisible. --surface-card (#f5f5f5) against --surface-soft (#f8f9fa)
-     was a ~1% step; --surface-strong is an actual one. */
-  --sidebar-accent: var(--surface-strong);
+     them invisible. --surface-strong (#f0f0f3) against --canvas-soft (#fafafa)
+     is a ~2% step; --hairline-strong is an actual one. */
+  --sidebar-accent: var(--hairline-strong);
   --sidebar-accent-foreground: var(--ink);
   --sidebar-border: var(--hairline);
   --sidebar-ring: var(--ink);
 }
 
 .dark {
-  /* The dark footer / featured-tier surface is the only dark treatment in
-     the design system — reused here as the app's dark theme base. */
-  --canvas: var(--surface-dark);
-  --surface-soft: var(--surface-dark-elevated);
-  --surface-card: var(--surface-dark-elevated);
+  /* DESIGN.md is a light-canvas marketing spec; its dark tokens describe code
+     blocks and IDE mockups. Those are the right base for an app that is dark
+     first — #171717 is the canvas, #1a1a1a the one step of lift above it. */
+  --canvas: #171717;
+  --canvas-soft: #1a1a1a;
+  --surface-soft: #1a1a1a;
+  --surface-card: #1a1a1a;
   --surface-strong: #2a2a2a;
   --hairline: rgba(255, 255, 255, 0.1);
   --hairline-soft: rgba(255, 255, 255, 0.06);
+  --hairline-strong: rgba(255, 255, 255, 0.16);
 
   --ink: var(--on-dark);
   --body-text: var(--on-dark-soft);
   --muted-text: var(--on-dark-soft);
   --muted-soft: #71717a;
 
+  /* Lifted off the light values to clear 4.5:1 on the #171717 canvas — the
+     light amber (#ab6400) lands at ~2.6:1 there, which would make a running
+     build the least readable thing on the page. Same hues, more luminance. */
+  --success: #22c55e;
+  --warning: #f0a92e;
+  --error: #f87171;
+
   --background: var(--canvas);
   --foreground: var(--ink);
-  --card: var(--surface-dark-elevated);
+  --card: var(--surface-card);
   --card-foreground: var(--ink);
-  --popover: var(--surface-dark-elevated);
+  --popover: var(--surface-card);
   --popover-foreground: var(--ink);
   --primary: #ffffff;
-  --primary-active: #e5e7eb;
-  --primary-foreground: #111111;
-  --secondary: var(--surface-dark-elevated);
+  --primary-active: #dcdee0;
+  --primary-foreground: #171717;
+  --secondary: var(--surface-strong);
   --secondary-foreground: var(--ink);
-  --muted: var(--surface-dark-elevated);
+  --muted: var(--surface-strong);
   --muted-foreground: var(--on-dark-soft);
-  --accent: var(--surface-dark-elevated);
+  --accent: var(--surface-strong);
   --accent-foreground: var(--ink);
   --destructive: var(--error);
   --border: var(--hairline);
-  --input: var(--hairline);
+  --input: var(--hairline-strong);
   --ring: var(--on-dark-soft);
-  --chart-1: var(--brand-accent);
-  --chart-2: var(--badge-violet);
-  --chart-3: var(--badge-emerald);
-  --chart-4: var(--badge-orange);
-  --chart-5: var(--badge-pink);
-  --sidebar: var(--surface-dark-elevated);
+  --chart-1: var(--accent-link-bright);
+  --chart-2: var(--accent-preview);
+  --chart-3: var(--success);
+  --chart-4: var(--warning);
+  --chart-5: var(--text-link-secondary);
+  --sidebar: var(--surface-soft);
   --sidebar-foreground: var(--ink);
-  --sidebar-primary: var(--brand-accent);
-  --sidebar-primary-foreground: #ffffff;
+  /* Was --brand-accent, which made the active nav marker blue in dark and
+     black in light — the same element reading as two different things. The
+     blue is reserved for links; selection follows --primary in both themes. */
+  --sidebar-primary: var(--primary);
+  --sidebar-primary-foreground: var(--primary-foreground);
   /* This was byte-identical to --sidebar (#1a1a1a), which left the sidebar
      with no visible hover *or* active state in dark mode — only the
      `font-medium` half of shadcn's active style was actually rendering. */
@@ -214,63 +243,69 @@
   }
 }
 
-/* Typography scale — Cal Sans (substituted with Manrope 600, negative
-   tracking) for display, Inter for everything else. See DESIGN.md. */
+/* Typography scale — a single family (Inter) split by weight and tracking:
+   600 with negative tracking for display, 400 for body, JetBrains Mono for
+   anything machine-generated. See DESIGN.md. */
 @layer base {
   h1,
   h2,
   h3,
   .font-display {
-    font-family: var(--font-display), var(--font-sans), -apple-system,
-      BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-family: var(--font-display), -apple-system, system-ui, sans-serif;
     font-weight: 600;
+    /* Expo's display tracking is proportional (~-3%) rather than a fixed px
+       step, so headings that don't take a .text-display-* class still read
+       right. Without it Inter 600 at large sizes looks loose and generic. */
+    letter-spacing: -0.03em;
   }
 
-  .text-display-xl {
+  .text-display-mega {
     font-size: 64px;
     font-weight: 600;
     line-height: 1.05;
-    letter-spacing: -2px;
+    letter-spacing: -1.92px;
   }
 
-  .text-display-lg {
+  .text-display-xl {
     font-size: 48px;
     font-weight: 600;
     line-height: 1.1;
-    letter-spacing: -1.5px;
+    letter-spacing: -1.44px;
   }
 
-  .text-display-md {
+  .text-display-lg {
     font-size: 36px;
     font-weight: 600;
     line-height: 1.15;
-    letter-spacing: -1px;
+    letter-spacing: -1.08px;
   }
 
-  .text-display-sm {
+  .text-display-md {
     font-size: 28px;
     font-weight: 600;
     line-height: 1.2;
-    letter-spacing: -0.5px;
+    letter-spacing: -0.84px;
   }
 
-  .text-title-lg {
+  .text-display-sm {
     font-size: 22px;
     font-weight: 600;
-    line-height: 1.3;
-    letter-spacing: -0.3px;
+    line-height: 1.25;
+    letter-spacing: -0.5px;
   }
 
   .text-title-md {
     font-size: 18px;
     font-weight: 600;
     line-height: 1.4;
+    letter-spacing: 0;
   }
 
   .text-title-sm {
     font-size: 16px;
     font-weight: 600;
     line-height: 1.4;
+    letter-spacing: 0;
   }
 
   .text-body-md {
@@ -287,7 +322,7 @@
 
   .text-caption {
     font-size: 13px;
-    font-weight: 500;
+    font-weight: 400;
     line-height: 1.4;
   }
 
@@ -297,9 +332,11 @@
     line-height: 1.4;
   }
 
+  /* Expo's buttons are weight 500, not 600 — the lighter label is part of why
+     a pure-black CTA reads as editorial rather than shouty. */
   .text-button {
     font-size: 14px;
-    font-weight: 600;
+    font-weight: 500;
     line-height: 1;
   }
 
@@ -307,15 +344,17 @@
   pre,
   .font-code {
     font-family: var(--font-mono), "JetBrains Mono", monospace;
+    font-size: 13px;
+    line-height: 1.5;
   }
 
-  /* Section eyebrow — uppercase micro-label with the loosened tracking the
-     type system calls for. Used above grouped content and in the sidebar. */
+  /* Section eyebrow — DESIGN.md's `caption-uppercase` token. Used above
+     grouped content and in the sidebar. */
   .text-eyebrow {
     font-size: 11px;
     font-weight: 600;
     line-height: 1.4;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.88px;
     text-transform: uppercase;
   }
 
