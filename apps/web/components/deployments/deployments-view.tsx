@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import axios from "axios";
+import { clientAxios } from "@/lib/axios-instance";
 import { Rocket, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -94,17 +94,16 @@ export function DeploymentsView() {
       setError(null);
 
       try {
-        const response = await axios.get<PaginatedResponse<DeploymentRow>>(
-          "/api/deployments",
-          {
-            params: {
-              page: currentPage,
-              limit,
-              ...(debouncedSearch && { search: debouncedSearch }),
-              ...(statusFilter && { status: statusFilter }),
-            },
+        const response = await clientAxios.get<
+          PaginatedResponse<DeploymentRow>
+        >("/deployments", {
+          params: {
+            page: currentPage,
+            limit,
+            ...(debouncedSearch && { search: debouncedSearch }),
+            ...(statusFilter && { status: statusFilter }),
           },
-        );
+        });
 
         setDeployments(response.data.data);
         setPagination(response.data.pagination);

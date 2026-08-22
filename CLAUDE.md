@@ -78,12 +78,12 @@ There are no tests in this project yet.
 The sidebar is context-aware: account-wide at the top level, project-scoped once
 you open a project.
 
-| Account level                | Project level                            |
-| ---------------------------- | ---------------------------------------- |
-| `/projects`                  | `/projects/[id]` — overview              |
-| `/deployments` (all projects)| `/projects/[id]/deployments`             |
-| `/settings/account`          | `/projects/[id]/environment`             |
-|                              | `/projects/[id]/settings`                |
+| Account level                 | Project level                |
+| ----------------------------- | ---------------------------- |
+| `/projects`                   | `/projects/[id]` — overview  |
+| `/deployments` (all projects) | `/projects/[id]/deployments` |
+| `/settings/account`           | `/projects/[id]/environment` |
+|                               | `/projects/[id]/settings`    |
 
 `/` is landing only; signed-in users go to `/projects`. `/dashboard` redirects to
 `/projects`. There is no back link inside a project — the header breadcrumb's

@@ -8,7 +8,8 @@ export type DeploymentStatus =
   | "CLONING"
   | "BUILDING"
   | "FAILED"
-  | "COMPLETED";
+  | "COMPLETED"
+  | "CANCELLED";
 
 export type StatusTone = "success" | "error" | "active" | "idle";
 
@@ -26,6 +27,7 @@ const STATUS_META: Record<string, StatusMeta> = {
   BUILDING: { label: "Building", tone: "active", isLive: true },
   CLONING: { label: "Cloning", tone: "active", isLive: true },
   QUEUED: { label: "Queued", tone: "idle", isLive: true },
+  CANCELLED: { label: "Cancelled", tone: "idle", isLive: false },
 };
 
 const UNKNOWN: StatusMeta = { label: "Unknown", tone: "idle", isLive: false };

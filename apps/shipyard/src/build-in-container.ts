@@ -246,6 +246,8 @@ export const buildInContainer = async (
   outputDir: string,
   framework: Framework | null = null,
   envVars: EnvVarPair[] = [],
+  /** Receives a stopper once the container exists, for cancellation. */
+  onContainerStart?: (stop: () => Promise<void>) => void,
 ) => {
   const log = deploymentLogger(deploymentId);
   const logs = new LogSink(deploymentId);
@@ -401,6 +403,14 @@ export const buildInContainer = async (
         logs.write(chunk.toString());
       });
     }
+
+    // Published so the worker's cancel subscriber can reach into this build —
+    // by the time a container exists, nothing outside this function holds it.
+    onContainerStart?.(async () => {
+      await container
+        .stop({ t: 0 })
+        .catch(() => container.kill().catch(() => {}));
+    });
 
     // Start the container
     await container.start();

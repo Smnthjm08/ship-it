@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import axios from "axios";
+import { clientAxios } from "@/lib/axios-instance";
 import { ChevronRight } from "lucide-react";
 import { shortId } from "@/lib/format";
 
@@ -39,8 +39,8 @@ export function AppBreadcrumb() {
     }
 
     let cancelled = false;
-    axios
-      .get(`/api/projects/${projectId}`)
+    clientAxios
+      .get(`/projects/${projectId}`)
       .then((res) => {
         if (!cancelled) setProjectName(res.data?.data?.name ?? null);
       })

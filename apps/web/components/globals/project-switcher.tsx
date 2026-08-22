@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import axios from "axios";
+import { clientAxios } from "@/lib/axios-instance";
 import { Check, ChevronsUpDown } from "lucide-react";
 import {
   Command,
@@ -45,8 +45,8 @@ export function ProjectSwitcher({
 
   useEffect(() => {
     if (!isOpen || projects) return;
-    axios
-      .get<{ data: SwitcherProject[] }>("/api/projects")
+    clientAxios
+      .get<{ data: SwitcherProject[] }>("/projects")
       .then((res) => setProjects(res.data.data))
       .catch(() => setProjects([]));
   }, [isOpen, projects]);

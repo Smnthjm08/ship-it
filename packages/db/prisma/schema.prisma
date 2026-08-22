@@ -92,6 +92,14 @@ model Project {
   installCommand String?    @default("npm install")
   isDeleted      Boolean    @default(false)
 
+  /// Pins the project subdomain to one deployment instead of "latest
+  /// COMPLETED" — this is what a rollback sets. Deliberately a plain id rather
+  /// than a relation: deployments are soft-deleted, so the proxy has to check
+  /// the target is still servable anyway and falls back to latest if not.
+  /// Cleared automatically when a newer build completes, so shipping a fix
+  /// after a rollback doesn't silently do nothing.
+  activeDeploymentId String?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -130,6 +138,7 @@ enum DeploymentStatus {
   BUILDING
   FAILED
   COMPLETED
+  CANCELLED
 }
 
 model Deployment {

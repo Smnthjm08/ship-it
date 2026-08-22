@@ -10,7 +10,7 @@ import {
 } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
-import axios from "axios";
+import { clientAxios } from "@/lib/axios-instance";
 import {
   LayoutDashboard,
   Layers,
@@ -88,8 +88,8 @@ export function CommandPaletteProvider({
 
   useEffect(() => {
     if (!isOpen || projects) return;
-    axios
-      .get<{ data: PaletteProject[] }>("/api/projects")
+    clientAxios
+      .get<{ data: PaletteProject[] }>("/projects")
       .then((res) => setProjects(res.data.data))
       .catch(() => setProjects([]));
   }, [isOpen, projects]);

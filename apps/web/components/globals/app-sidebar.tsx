@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import axios from "axios";
+import { clientAxios } from "@/lib/axios-instance";
 import {
   ExternalLink,
   LayoutDashboard,
@@ -89,9 +89,12 @@ function AccountSidebar({ pathname }: { pathname: string }) {
 
   const load = async () => {
     try {
-      const res = await axios.get<{ data: SidebarProject[] }>("/api/projects", {
-        params: { limit: 5 },
-      });
+      const res = await clientAxios.get<{ data: SidebarProject[] }>(
+        "/projects",
+        {
+          params: { limit: 5 },
+        },
+      );
       setProjects(res.data.data);
     } catch {
       // The sidebar is ambient — a failed fetch just means no recent list.
@@ -189,7 +192,7 @@ function ProjectSidebar({
 
   const load = async () => {
     try {
-      const res = await axios.get(`/api/projects/${projectId}`);
+      const res = await clientAxios.get(`/projects/${projectId}`);
       setProject(res.data.data);
     } catch {
       setProject(null);

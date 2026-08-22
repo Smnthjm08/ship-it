@@ -58,6 +58,29 @@ async function lookup(subdomain: string): Promise<Route> {
   }
 
   // Otherwise treat it as a project id and serve its current production build.
+  //
+  // A rollback pins `activeDeploymentId`. The pin is only honoured if it still
+  // points at a completed, non-deleted build of this project — otherwise the
+  // site would 404 because of a stale pointer, which is a far worse failure
+  // than quietly serving the newest good build.
+  const pinned = await prisma.project.findFirst({
+    where: { id: subdomain, isDeleted: false, activeDeploymentId: { not: null } },
+    select: { activeDeploymentId: true },
+  });
+
+  if (pinned?.activeDeploymentId) {
+    const target = await prisma.deployment.findFirst({
+      where: {
+        id: pinned.activeDeploymentId,
+        projectId: subdomain,
+        status: "COMPLETED",
+        isDeleted: false,
+      },
+      select: { id: true },
+    });
+    if (target) return { kind: "ready", deploymentId: target.id };
+  }
+
   const latest = await prisma.deployment.findFirst({
     where: {
       projectId: subdomain,

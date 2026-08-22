@@ -32,6 +32,7 @@
     "./env/require": "./src/env/require.ts",
     "./env/vars": "./src/env/vars.ts",
     "./logger": "./src/logger/index.ts",
+    "./redis/cancel": "./src/redis/cancel.ts",
     "./redis/client": "./src/redis/client.ts",
     "./redis/logs": "./src/redis/logs.ts",
     "./redis/publisher": "./src/redis/publisher.ts",

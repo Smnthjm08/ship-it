@@ -31,13 +31,11 @@ recently has been opened in a browser.
 - [ ] Custom domains (DNS CNAME → proxy)
 - [ ] GitHub webhooks for push-to-deploy
 - [ ] Branch-based deploys — `branch` is stored, but every deploy hits one subdomain
-- [ ] Rollback — repoint a project at a previous deployment's S3 prefix
 - [ ] Notifications (email / Slack / Discord)
 - [ ] AI deployment suggestions
 
 ## Repo hygiene
 
-- [ ] `.husky/pre-commit` runs only `pnpm format` — add lint + check-types
 - [ ] Pin the build image to a digest, not the `node:20-alpine` tag
 - [ ] `pnpm audit` in CI, plus `gitleaks`/`trufflehog`
 - [ ] README needs the pipeline diagram above the fold and the env-var table
@@ -62,10 +60,11 @@ Dependabot, and a hosted demo (needs a VPS — the worker wants a Docker daemon)
 
 Type-checks and builds, never proven at runtime:
 
+- Rollback end to end — the pin, the proxy fallback and the auto-clear on a newer build are all unexercised against a real deployment
 - Authenticated screens — palette, switcher and mobile bar unclicked; the palette already shipped one crash this way
 - `CapDrop: ["ALL"]` — never run against a live Docker daemon; first suspect if a build fails on permissions
 - The 503 queue-outage branches — reasoned, not exercised (`isQueueReady()` itself is confirmed via `/api/v1/health`)
 - Live polling during a build — needs Redis, Docker and the worker at once
 - Mobile at 375px — action bar and env-row wrapping both depend on it
-- `CANCELLED` migration not applied — run `pnpm db:migrate`; until then the enum value exists in the client but not the database
+- Two schema changes not applied — run `pnpm db:migrate`. `CANCELLED` and `Project.activeDeploymentId` exist in the Prisma client but not in Postgres, so cancel and rollback will fail at runtime until then
 - Env masking in Firefox — `-webkit-text-security` unsupported, so values show until toggled

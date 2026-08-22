@@ -15,7 +15,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Loader2, Save } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import axios from "axios";
+import { clientAxios } from "@/lib/axios-instance";
 import { toast } from "sonner";
 
 interface EditProjectFormProps {
@@ -38,7 +38,7 @@ export function EditProjectForm({
     e.preventDefault();
     setIsSaving(true);
     try {
-      await axios.put(`/api/projects/${projectId}`, {
+      await clientAxios.patch(`/projects/${projectId}`, {
         name: projectName,
         description,
       });

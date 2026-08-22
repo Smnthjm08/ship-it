@@ -25,7 +25,7 @@ import { RecentDeployments } from "@/components/dashboard/recent-deployments";
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import type { PaginatedResponse, PaginationMeta } from "@/types/api";
-import axios from "axios";
+import { clientAxios } from "@/lib/axios-instance";
 import { SessionUser } from "@/types/session";
 import { isLiveStatus } from "@/lib/deployment-status";
 import { useLiveRefresh } from "@/hooks/use-live-refresh";
@@ -91,8 +91,8 @@ export default function Dashboard({ user }: DashboardProps) {
       setError(null);
 
       try {
-        const response = await axios.get<PaginatedResponse<ProjectTypes>>(
-          "/api/projects",
+        const response = await clientAxios.get<PaginatedResponse<ProjectTypes>>(
+          "/projects",
           {
             params: {
               page: currentPage,

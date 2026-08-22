@@ -15,6 +15,7 @@ import {
   Terminal,
   MoreHorizontal,
   RotateCw,
+  History,
   Trash2,
 } from "lucide-react";
 import Link from "next/link";
@@ -27,7 +28,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useState } from "react";
-import axios from "axios";
+import { clientAxios } from "@/lib/axios-instance";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { deploymentUrl } from "@/lib/deployment-url";
@@ -85,10 +86,29 @@ export function DeploymentTable({
   const router = useRouter();
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
 
+  const [isRollingBack, setIsRollingBack] = useState<string | null>(null);
+
+  const handleRollback = async (deployment: Deployment) => {
+    setIsRollingBack(deployment.id);
+    try {
+      await clientAxios.post(`/projects/${deployment.projectId}/rollback`, {
+        deploymentId: deployment.id,
+      });
+      // The proxy memoises routes, so the switch isn't instant.
+      toast.success("Rolled back — live within 30 seconds");
+      router.refresh();
+    } catch (error) {
+      console.error("Failed to roll back", error);
+      toast.error("Failed to roll back");
+    } finally {
+      setIsRollingBack(null);
+    }
+  };
+
   const handleDelete = async (deploymentId: string) => {
     setIsDeleting(deploymentId);
     try {
-      await axios.delete(`/api/deployments/${deploymentId}`);
+      await clientAxios.delete(`/deployments/${deploymentId}`);
       toast.success("Deployment deleted");
       router.refresh();
     } catch (error) {
@@ -220,6 +240,18 @@ export function DeploymentTable({
                               <ExternalLink className="mr-2 h-4 w-4" />
                               Visit site
                             </a>
+                          </DropdownMenuItem>
+                        )}
+                        {deployment.status === "COMPLETED" && (
+                          <DropdownMenuItem
+                            disabled={isRollingBack === deployment.id}
+                            onSelect={(e) => {
+                              e.preventDefault();
+                              handleRollback(deployment);
+                            }}
+                          >
+                            <History className="mr-2 h-4 w-4" />
+                            Roll back to this
                           </DropdownMenuItem>
                         )}
                         {(deployment.status === "COMPLETED" ||

@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import axios from "axios";
+import { clientAxios } from "@/lib/axios-instance";
 import { ArrowRight, RefreshCw } from "lucide-react";
 import {
   Card,
@@ -68,8 +68,8 @@ export function RecentDeployments({ className }: { className?: string }) {
       if (!silent) setIsLoading(true);
 
       try {
-        const res = await axios.get<PaginatedResponse<RecentDeployment>>(
-          "/api/deployments",
+        const res = await clientAxios.get<PaginatedResponse<RecentDeployment>>(
+          "/deployments",
           { params: { limit: LIMIT } },
         );
         setDeployments(res.data.data);

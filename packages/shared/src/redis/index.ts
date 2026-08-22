@@ -39,3 +39,4 @@ export * from "./subscriber.js";
 export * from "./queue.js";
 export * from "./config.js";
 export * from "./logs.js";
+export * from "./cancel.js";

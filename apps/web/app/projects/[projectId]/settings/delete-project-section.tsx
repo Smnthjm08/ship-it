@@ -14,7 +14,7 @@ import { Label } from "@/components/ui/label";
 import { Trash2, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import axios from "axios";
+import { clientAxios } from "@/lib/axios-instance";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -46,7 +46,7 @@ export function DeleteProjectSection({
     if (!canDelete) return;
     setIsDeleting(true);
     try {
-      await axios.delete(`/api/projects/${projectId}`);
+      await clientAxios.delete(`/projects/${projectId}`);
       toast.success(`Deleted ${projectName}`);
       router.push("/projects");
       router.refresh();

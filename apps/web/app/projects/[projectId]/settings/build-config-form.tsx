@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import axios from "axios";
+import { clientAxios } from "@/lib/axios-instance";
 import { toast } from "sonner";
 import { Loader2, Save } from "lucide-react";
 import {
@@ -88,7 +88,7 @@ export function BuildConfigForm({ projectId, initial }: BuildConfigFormProps) {
     try {
       // The endpoint patches only the fields it receives, so this form never
       // touches the project's name or description.
-      await axios.put(`/api/projects/${projectId}`, {
+      await clientAxios.patch(`/projects/${projectId}`, {
         ...form,
         branch: form.branch.trim(),
       });

@@ -6,20 +6,22 @@ import {
   deploymentLimiter,
   githubSearchLimiter,
 } from "../middlewares/rate-limit.middleware";
-import {
-  newProjectController,
-  createProjectController,
-} from "../controllers/new-project.controller";
+import { searchReposController } from "../controllers/search-repos.controller";
+import { createProjectController } from "../controllers/create-project.controller";
 import {
   listProjectsController,
   getProjectController,
   deleteProjectController,
+  updateProjectController,
+  rollbackProjectController,
 } from "../controllers/project.controller";
 import {
   listEnvVarsController,
   replaceEnvVarsController,
 } from "../controllers/env-var.controller";
 import {
+  cancelDeploymentController,
+  listAllDeploymentsController,
   listDeploymentsController,
   redeployController,
   getDeploymentController,
@@ -43,7 +45,12 @@ v1Router.get("/health", (_req: Request, res: Response) => {
 });
 
 // Repo search + project creation (the "import a repo" flow).
-v1Router.get("/new", authMiddleware, githubSearchLimiter, newProjectController);
+v1Router.get(
+  "/new",
+  authMiddleware,
+  githubSearchLimiter,
+  searchReposController,
+);
 v1Router.post(
   "/new",
   authMiddleware,
@@ -54,6 +61,12 @@ v1Router.post(
 // Projects
 v1Router.get("/projects", authMiddleware, listProjectsController);
 v1Router.get("/projects/:projectId", authMiddleware, getProjectController);
+v1Router.patch("/projects/:projectId", authMiddleware, updateProjectController);
+v1Router.post(
+  "/projects/:projectId/rollback",
+  authMiddleware,
+  rollbackProjectController,
+);
 v1Router.delete(
   "/projects/:projectId",
   authMiddleware,
@@ -81,6 +94,9 @@ v1Router.post(
   redeployController,
 );
 
+// Cross-project activity feed
+v1Router.get("/deployments", authMiddleware, listAllDeploymentsController);
+
 // Individual deployments
 v1Router.get(
   "/deployments/:deploymentId",
@@ -91,6 +107,11 @@ v1Router.get(
   "/deployments/:deploymentId/logs",
   authMiddleware,
   getDeploymentLogsController,
+);
+v1Router.post(
+  "/deployments/:deploymentId/cancel",
+  authMiddleware,
+  cancelDeploymentController,
 );
 v1Router.delete(
   "/deployments/:deploymentId",

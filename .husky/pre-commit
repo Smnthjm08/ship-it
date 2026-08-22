@@ -1,1 +1,6 @@
+# Format first so lint sees the formatted output, then gate on the two checks
+# that actually break CI. Turborepo caches all three, so a commit that touches
+# nothing since the last run costs a few hundred milliseconds.
 pnpm format
+pnpm lint
+pnpm check-types

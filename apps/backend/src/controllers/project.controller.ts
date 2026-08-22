@@ -152,3 +152,54 @@ export const updateProjectController = async (req: Request, res: Response) => {
     });
   }
 };
+
+/**
+ * POST /projects/:projectId/rollback
+ * Body: `{ deploymentId }` to pin, or `{ deploymentId: null }` to return to the
+ * latest completed build. Takes up to `PROXY_ROUTE_CACHE_TTL_MS` to be visible.
+ */
+export const rollbackProjectController = async (
+  req: Request,
+  res: Response,
+) => {
+  try {
+    const projectId = req.params.projectId!;
+    const project = await projectService.getOwnedProject(
+      projectId,
+      req.user!.id,
+    );
+    if (!project) {
+      return res
+        .status(404)
+        .json({ message: "Project not found", data: null, error: null });
+    }
+
+    const raw = (req.body ?? {}).deploymentId;
+    if (raw !== null && typeof raw !== "string") {
+      const message = "deploymentId must be a string, or null to reset";
+      return res.status(400).json({ message, data: null, error: message });
+    }
+
+    const updated = await projectService.setActiveDeployment(projectId, raw);
+    if (!updated) {
+      const message =
+        "That deployment can't be served — it must be a completed build of this project";
+      return res.status(400).json({ message, data: null, error: message });
+    }
+
+    return res.status(200).json({
+      message: raw
+        ? "Rolled back. The change is live within 30 seconds."
+        : "Restored to the latest deployment.",
+      data: updated,
+      error: null,
+    });
+  } catch (error) {
+    req.log.error({ err: error }, "Error rolling back project");
+    return res.status(500).json({
+      message: "Internal server error",
+      data: null,
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
+  }
+};
