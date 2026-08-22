@@ -141,7 +141,7 @@ export function DeploymentsView() {
   return (
     <div className="container mx-auto px-4 py-8 md:px-6 md:py-10">
       <div className="mb-8">
-        <h1 className="text-2xl font-semibold tracking-tight">Deployments</h1>
+        <h1 className="text-display-sm">Deployments</h1>
         <p className="text-muted-foreground mt-1 text-sm">
           Every build across all your projects
         </p>

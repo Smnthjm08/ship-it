@@ -62,9 +62,7 @@ export default async function NewProjectPage({
       </Button>
 
       <div className="mt-6 mb-8">
-        <h1 className="text-display-sm">
-          Import a repository
-        </h1>
+        <h1 className="text-display-sm">Import a repository</h1>
         <p className="text-muted-foreground mt-1 text-sm">
           Pick a GitHub repo and ShipIt builds it and serves it on its own URL.
         </p>

@@ -2,12 +2,8 @@ import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { prisma } from "@repo/db";
 
-/**
- * The OAuth callback is served by whichever app sits at BETTER_AUTH_URL — that's
- * the Next.js app (`apps/web/app/api/auth/[...all]/route.ts`), not the backend.
- * GitHub rejects the sign-in with "The redirect_uri is not associated with this
- * application" unless this exact URL is registered on the GitHub OAuth App.
- */
+// The callback is served by whatever sits at BETTER_AUTH_URL — the Next app, not
+// the backend. This exact URL must be registered on the GitHub OAuth App.
 const baseURL = process.env.BETTER_AUTH_URL;
 
 export const GITHUB_CALLBACK_URL = `${baseURL ?? "http://localhost:3000"}/api/auth/callback/github`;

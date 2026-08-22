@@ -23,12 +23,8 @@ const SECTION_LABELS: Record<string, string> = {
   profile: "Account",
 };
 
-/**
- * Breadcrumb for the app header.
- *
- * This replaces the per-project tab strip's breadcrumb line: with the sidebar
- * now carrying project navigation, the header only has to answer "where am I".
- */
+// Replaces the old per-project tab strip: the sidebar carries navigation now, so
+// the header only has to answer "where am I".
 export function AppBreadcrumb() {
   const pathname = usePathname();
   const segments = pathname.split("/").filter(Boolean);

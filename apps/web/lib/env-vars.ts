@@ -1,9 +1,5 @@
-/**
- * Client-side mirror of the API's env-var rules (`@repo/shared/env/vars`), kept
- * here so the browser bundle doesn't pull in a server package. The API
- * re-validates everything — this is for immediate feedback and for parsing a
- * pasted `.env`.
- */
+// Client mirror of `@repo/shared/env/vars`, kept separate so the browser bundle
+// doesn't pull in a server package. The API re-validates; this is for feedback.
 
 export const ENV_KEY_PATTERN = /^[A-Za-z_][A-Za-z0-9_]*$/;
 

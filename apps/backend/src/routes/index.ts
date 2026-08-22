@@ -30,7 +30,9 @@ v1Router.get("/health", (_req: Request, res: Response) => {
   const queue = isQueueReady();
   res.status(queue ? 200 : 503).json({
     status: queue ? "OK" : "DEGRADED",
-    message: queue ? "healthy!" : "Redis is unreachable — builds cannot be queued",
+    message: queue
+      ? "healthy!"
+      : "Redis is unreachable — builds cannot be queued",
     checks: { redis: queue ? "up" : "down" },
   });
 });

@@ -138,7 +138,7 @@ export default function CreateNewProjectForm() {
   return (
     <div className="container mx-auto max-w-2xl px-4 py-8 md:py-10">
       <div className="mb-8">
-        <h1 className="text-2xl font-semibold tracking-tight">New project</h1>
+        <h1 className="text-display-sm">New project</h1>
         {/* The repo you're importing, stated as fact — not a form field. */}
         <Link
           href={repoUrl}

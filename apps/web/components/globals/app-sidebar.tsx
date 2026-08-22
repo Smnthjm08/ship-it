@@ -30,6 +30,7 @@ import { deploymentUrl } from "@/lib/deployment-url";
 import { relativeTime } from "@/lib/format";
 import { isLiveStatus } from "@/lib/deployment-status";
 import { useLiveRefresh } from "@/hooks/use-live-refresh";
+import { ProjectSwitcher } from "./project-switcher";
 import { cn } from "@/lib/utils";
 
 interface SidebarProject {
@@ -49,18 +50,9 @@ const ACCOUNT_NAV = [
   { title: "Deployments", href: "/deployments", icon: Rocket },
 ];
 
-/**
- * The sidebar has two modes.
- *
- * At the account level it lists your projects and their live status. Once you
- * open a project it becomes that project's sidebar — nav plus the latest
- * deployment — which is what makes deep navigation feel like you're somewhere
- * rather than just further down a URL.
- *
- * It deliberately carries no primary action and no account menu: every project
- * page renders its own redeploy button next to the status it acts on, and the
- * account menu lives in the header so it sits in one place across both shells.
- */
+// Two modes: account level lists projects and their live status; inside a
+// project it becomes that project's nav plus its latest deployment. No account
+// menu here — that lives in the header so it sits in one place across both shells.
 export function AppSidebar() {
   const pathname = usePathname();
   const projectId = useProjectId(pathname);
@@ -242,16 +234,12 @@ function ProjectSidebar({
   return (
     <>
       <SidebarHeader>
-        {/* No back link here: the header breadcrumb's "Projects" crumb is the
-            escape hatch, and two of them in the same corner is noise. */}
-        <div className="flex items-center gap-2 px-2 py-1.5">
-          <div className="bg-primary text-primary-foreground flex aspect-square size-7 shrink-0 items-center justify-center rounded-md text-xs font-semibold">
-            {project?.name?.[0]?.toUpperCase() ?? "·"}
-          </div>
-          <span className="truncate text-sm font-semibold group-data-[collapsible=icon]:hidden">
-            {project?.name ?? "Loading…"}
-          </span>
-        </div>
+        {/* No back link: the breadcrumb's "Projects" crumb is the escape hatch,
+            and the switcher covers moving sideways. */}
+        <ProjectSwitcher
+          projectId={projectId}
+          projectName={project?.name ?? null}
+        />
       </SidebarHeader>
 
       <SidebarContent>

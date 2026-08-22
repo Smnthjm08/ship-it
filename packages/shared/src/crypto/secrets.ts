@@ -5,25 +5,18 @@ import {
   randomBytes,
 } from "node:crypto";
 
-/**
- * Authenticated encryption for values we must be able to read back — currently
- * project environment variables, which Shipyard decrypts at build time.
- *
- * Format: `v1.<iv>.<authTag>.<ciphertext>`, all base64. The version prefix is
- * there so the scheme can be rotated without guessing at old rows.
- */
+// Authenticated encryption for values we must read back — project env vars,
+// decrypted by Shipyard at build time. Format `v1.<iv>.<authTag>.<ciphertext>`,
+// base64; the version prefix lets the scheme rotate without guessing at old rows.
 const VERSION = "v1";
 const IV_BYTES = 12; // GCM standard nonce length
 const KEY_BYTES = 32; // AES-256
 
 let cachedKey: Buffer | null = null;
 
-/**
- * Prefer an explicit `ENV_SECRET_KEY`; fall back to deriving one from
- * `BETTER_AUTH_SECRET` so a self-hosted install works without extra config.
- * Rotating either value makes existing ciphertext undecryptable, so the derived
- * key is a convenience, not the recommended setup.
- */
+// Prefers ENV_SECRET_KEY, falling back to one derived from BETTER_AUTH_SECRET so
+// a self-hosted install works unconfigured. Rotating either makes existing
+// ciphertext undecryptable — the derived key is a convenience, not a recommendation.
 function resolveKey(): Buffer {
   if (cachedKey) return cachedKey;
 

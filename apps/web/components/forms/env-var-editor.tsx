@@ -13,12 +13,8 @@ interface EnvVarEditorProps {
   disabled?: boolean;
 }
 
-/**
- * Key/value editor for build-time environment variables, shared by the import
- * form and project settings. Values are masked by default — the settings copy
- * renders rows whose value the server never sends back (`stored`), where an
- * empty field means "keep the existing secret".
- */
+// Shared by the import form and project settings. Values are masked; settings
+// renders `stored` rows the server never sends back, where empty = keep the secret.
 export function EnvVarEditor({ rows, onChange, disabled }: EnvVarEditorProps) {
   const [revealed, setRevealed] = useState<Set<number>>(new Set());
   const [pasteOpen, setPasteOpen] = useState(false);

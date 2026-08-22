@@ -96,7 +96,11 @@ export const newProjectController = async (req: Request, res: Response) => {
   }
 };
 
-import { enqueueBuild, isQueueReady, QueueUnavailableError } from "@repo/shared";
+import {
+  enqueueBuild,
+  isQueueReady,
+  QueueUnavailableError,
+} from "@repo/shared";
 import { EnvVarValidationError, normalizeEnvVars } from "@repo/shared/env/vars";
 import {
   createProjectSchema,

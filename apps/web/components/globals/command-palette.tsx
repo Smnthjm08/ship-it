@@ -151,9 +151,7 @@ export function CommandPaletteProvider({
                 </CommandItem>
                 <CommandItem
                   onSelect={() =>
-                    run(() =>
-                      router.push(`/projects/${projectId}/deployments`),
-                    )
+                    run(() => router.push(`/projects/${projectId}/deployments`))
                   }
                   value="project deployments builds"
                 >
@@ -162,9 +160,7 @@ export function CommandPaletteProvider({
                 </CommandItem>
                 <CommandItem
                   onSelect={() =>
-                    run(() =>
-                      router.push(`/projects/${projectId}/environment`),
-                    )
+                    run(() => router.push(`/projects/${projectId}/environment`))
                   }
                   value="environment variables secrets env"
                 >

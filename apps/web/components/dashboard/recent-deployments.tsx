@@ -55,16 +55,9 @@ function RowSkeleton() {
   );
 }
 
-/**
- * The account-level activity rail.
- *
- * The grid answers "is each project healthy"; this answers "what just
- * happened", which the grid can't — it only shows each project's newest build,
- * ordered by creation date rather than by activity.
- *
- * Secondary surface: a failed fetch says so quietly rather than throwing an
- * alert next to a project list that loaded fine.
- */
+// The grid answers "is each project healthy"; this answers "what just happened",
+// which the grid can't — it's ordered by creation date, not activity. Secondary
+// surface, so a failed fetch says so quietly rather than alerting.
 export function RecentDeployments({ className }: { className?: string }) {
   const [deployments, setDeployments] = useState<RecentDeployment[]>([]);
   const [isLoading, setIsLoading] = useState(true);

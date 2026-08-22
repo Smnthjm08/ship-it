@@ -1,13 +1,8 @@
 import { S3Client } from "@aws-sdk/client-s3";
 
-/**
- * Single source of truth for the S3 client used by both `shipyard` (uploads)
- * and `proxy` (reads). Keeping this in one place prevents the two ends from
- * drifting — e.g. uploading to real AWS while reading from an R2/MinIO endpoint.
- *
- * `AWS_ENDPOINT` opts into any S3-compatible service (Cloudflare R2, MinIO, …);
- * when it is set we force path-style addressing, which those services require.
- */
+// One client for both shipyard (uploads) and proxy (reads), so the two ends
+// can't drift — e.g. uploading to AWS while reading from R2. AWS_ENDPOINT opts
+// into any S3-compatible service and forces path-style addressing, which they need.
 export const createS3Client = (): S3Client =>
   new S3Client({
     region: process.env.AWS_REGION || "ap-south-1",

@@ -1,8 +1,5 @@
-/**
- * Request schemas for the two project write paths — create (backend Express)
- * and update (web route handler). Shared so a value rejected by one is rejected
- * by the other. No Node imports, same as `env/vars.ts`.
- */
+// Shared by both project write paths — create (Express) and update (web route
+// handler) — so a value rejected by one is rejected by the other. No Node imports.
 import { z } from "zod";
 
 export const FRAMEWORKS = ["NEXTJS", "REACT", "VITE", "NODE", "NONE"] as const;
@@ -10,11 +7,8 @@ export const FRAMEWORKS = ["NEXTJS", "REACT", "VITE", "NODE", "NONE"] as const;
 const MAX_PATH_LENGTH = 255;
 const MAX_COMMAND_LENGTH = 500;
 
-/**
- * Lexical resolution of a POSIX-ish relative path, mirroring `resolveWithin()`
- * in shipyard. `null` means it escapes the base, so `apps/../apps/site` is fine
- * and `../secrets` is not — the same answer both layers give.
- */
+// Mirrors `resolveWithin()` in shipyard. `null` = escapes the base, so
+// `apps/../apps/site` passes and `../secrets` doesn't.
 function resolveSegments(value: string): string[] | null {
   const out: string[] = [];
 
@@ -31,11 +25,8 @@ function resolveSegments(value: string): string[] | null {
   return out;
 }
 
-/**
- * A path the build worker will join onto the clone directory. Rejected here so
- * the user sees it on Save rather than minutes into a build — shipyard checks
- * again at build time, where symlinks can also be resolved.
- */
+// Rejected here so the user sees it on Save, not minutes into a build.
+// Shipyard re-checks at build time, where symlinks resolve too.
 const repoPath = (label: string) =>
   z
     .string()
@@ -97,10 +88,8 @@ export const createProjectSchema = z.object({
   envVars: z.unknown().optional(),
 });
 
-/**
- * Patch semantics: only fields the client actually sent are validated and
- * written, so the general-settings and build-settings forms save independently.
- */
+// Patch semantics: only fields actually sent are validated and written, so the
+// general and build settings forms save independently.
 export const updateProjectSchema = z.object({
   name: projectName.optional(),
   description: z.string().max(500, "Description is too long").nullish(),

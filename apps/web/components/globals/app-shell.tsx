@@ -12,6 +12,11 @@ import { AppTopbar } from "./app-topbar";
 import { AppBreadcrumb } from "./app-breadcrumb";
 import { ThemeToggle } from "./theme-toggle";
 import { UserMenu } from "./user-menu";
+import {
+  CommandPaletteProvider,
+  CommandPaletteTrigger,
+} from "./command-palette";
+import { MobileActionBar } from "./mobile-action-bar";
 
 /** `/projects/<id>/...` — anything deeper than the list itself. */
 const PROJECT_ROUTE = /^\/projects\/[^/]+/;
@@ -33,29 +38,37 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   if (!PROJECT_ROUTE.test(pathname)) {
     return (
-      <div className="flex min-h-svh flex-col">
-        <AppTopbar />
-        <div className="flex flex-1 flex-col">{children}</div>
-      </div>
+      <CommandPaletteProvider>
+        <div className="flex min-h-svh flex-col">
+          <AppTopbar />
+          <div className="flex flex-1 flex-col">{children}</div>
+        </div>
+      </CommandPaletteProvider>
     );
   }
 
+  const projectId = pathname.split("/")[2]!;
+
   return (
-    <SidebarProvider>
-      <AppSidebar />
-      <SidebarInset>
-        {/* Same cluster as the top bar, so the account menu doesn't jump
-            across the screen when you open a project. */}
-        <header className="bg-background/80 sticky top-0 z-10 flex h-14 shrink-0 items-center gap-3 border-b px-4 backdrop-blur-sm">
-          <SidebarTrigger className="-ml-1" />
-          <AppBreadcrumb />
-          <div className="ml-auto flex items-center gap-1">
-            <ThemeToggle />
-            <UserMenu />
-          </div>
-        </header>
-        <div className="flex flex-1 flex-col">{children}</div>
-      </SidebarInset>
-    </SidebarProvider>
+    <CommandPaletteProvider>
+      <SidebarProvider>
+        <AppSidebar />
+        <SidebarInset>
+          {/* Same cluster as the top bar, so the account menu doesn't jump
+              across the screen when you open a project. */}
+          <header className="bg-background/80 sticky top-0 z-10 flex h-14 shrink-0 items-center gap-3 border-b px-4 backdrop-blur-sm">
+            <SidebarTrigger className="-ml-1" />
+            <AppBreadcrumb />
+            <div className="ml-auto flex items-center gap-1">
+              <CommandPaletteTrigger className="hidden sm:inline-flex" />
+              <ThemeToggle />
+              <UserMenu />
+            </div>
+          </header>
+          <div className="flex flex-1 flex-col">{children}</div>
+          <MobileActionBar projectId={projectId} />
+        </SidebarInset>
+      </SidebarProvider>
+    </CommandPaletteProvider>
   );
 }

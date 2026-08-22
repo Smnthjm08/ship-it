@@ -2,14 +2,8 @@
 
 import { useEffect } from "react";
 
-/**
- * Re-runs `refresh` on an interval while `enabled` is true.
- *
- * Deploy lists are only interesting while something is moving, so callers pass
- * `enabled` = "any deployment is still queued, cloning or building". Once
- * everything reaches a terminal state the interval is torn down and the page
- * goes quiet — no background polling on a screen full of finished builds.
- */
+// Re-runs `refresh` while `enabled`. Callers pass "any deployment is still
+// queued, cloning or building", so a screen of finished builds stops polling.
 export function useLiveRefresh(
   refresh: () => void,
   enabled: boolean,

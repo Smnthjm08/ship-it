@@ -17,13 +17,8 @@ export const TEXT_TONE: Record<StatusTone, string> = {
   idle: "text-muted-foreground",
 };
 
-/**
- * The status dot on its own — for tight surfaces like the sidebar.
- *
- * Colour alone can't carry meaning (colour-blind users, greyscale displays), so
- * every dot ships with a screen-reader label and is paired with visible text
- * wherever there's room.
- */
+// Dot alone, for tight surfaces like the sidebar. Colour can't carry meaning by
+// itself, so every dot has an sr-only label and visible text wherever there's room.
 export function StatusDot({
   status,
   className,

@@ -12,14 +12,9 @@ interface RedeployResponse {
   data: { id: string } | null;
 }
 
-/**
- * Queues a fresh build of the project's current branch and follows it to the
- * live log view.
- *
- * The API allows one in-flight deployment per project and answers 409 with the
- * build that's already running — treat that as "you're already there" and
- * navigate to it rather than surfacing an error.
- */
+// Queues a build of the current branch and follows it to the live log view.
+// One in-flight deployment per project, so a 409 means "you're already there" —
+// navigate to the running build rather than surfacing an error.
 export function useRedeploy(projectId: string) {
   const router = useRouter();
   const [isRedeploying, setIsRedeploying] = useState(false);

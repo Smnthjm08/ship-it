@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "./theme-toggle";
 import { UserMenu } from "./user-menu";
+import { CommandPaletteTrigger } from "./command-palette";
 
 const NAV = [
   { title: "Projects", href: "/projects" },
@@ -21,14 +22,9 @@ function isActive(href: string, pathname: string) {
   return pathname.startsWith(href);
 }
 
-/**
- * The account-level shell's only chrome.
- *
- * The project list *is* the navigation at this level, so the bar carries only
- * what the page body can't: the two top-level destinations and the account
- * controls. Height matches the project-level header so switching between shells
- * moves the sidebar and nothing else.
- */
+// The project list *is* the navigation here, so the bar carries only what the
+// page body can't. Height matches the project header so switching shells moves
+// the sidebar and nothing else.
 export function AppTopbar() {
   const pathname = usePathname();
 
@@ -74,6 +70,7 @@ export function AppTopbar() {
       </nav>
 
       <div className="ml-auto flex items-center gap-1">
+        <CommandPaletteTrigger className="hidden sm:inline-flex" />
         <ThemeToggle />
         <UserMenu />
       </div>

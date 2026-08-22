@@ -1,12 +1,7 @@
-/**
- * One place that knows what a deployment status means.
- *
- * The API speaks the Prisma enum (`QUEUED | CLONING | BUILDING | FAILED |
- * COMPLETED`); users read "Ready" and "Error". Translating at this boundary is
- * what stops five components from each inventing their own mapping — which is
- * how the list view ended up comparing against a `"success"` that the API has
- * never returned.
- */
+// The single place that knows what a status means. The API speaks the Prisma
+// enum, users read "Ready"/"Error". Translating here is what stopped five
+// components inventing their own mapping — one compared against a `"success"`
+// the API has never returned.
 
 export type DeploymentStatus =
   | "QUEUED"

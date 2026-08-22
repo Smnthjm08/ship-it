@@ -142,9 +142,7 @@ export default function Dashboard({ user }: DashboardProps) {
       {/* Asymmetric: greeting left, action right. Not a centered hero. */}
       <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-display-sm">
-            {firstName}&apos;s projects
-          </h1>
+          <h1 className="text-display-sm">{firstName}&apos;s projects</h1>
           <p className="text-muted-foreground mt-1 text-sm">
             {pagination.total > 0
               ? `${pagination.total} project${pagination.total === 1 ? "" : "s"} connected to GitHub`

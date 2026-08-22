@@ -87,9 +87,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
       <section className="flex flex-col gap-5 border-b pb-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="min-w-0">
-            <h1 className="text-display-sm truncate">
-              {project.name}
-            </h1>
+            <h1 className="text-display-sm truncate">{project.name}</h1>
             <div className="text-muted-foreground mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
               <a
                 href={project.repoUrl}

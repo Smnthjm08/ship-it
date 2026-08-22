@@ -17,9 +17,14 @@ is editable, status has one vocabulary, the log viewer is real, and the sidebar
 follows project context.
 
 What's missing is the hardening layer. The blockers below are closed, but there
-are still no tests, no CI, no structured logging, no rate limiting and no
-one-command local setup. That gap — between the architecture's ambition and the
-operational maturity around it — is the remaining finding.
+are still no tests, no CI, no structured logging and no rate limiting. That gap —
+between the architecture's ambition and the operational maturity around it — is
+the remaining finding.
+
+**Current goal: portfolio-ready, not contributor-ready.** Work is ordered for
+someone evaluating this repo as a work sample. Open-source scaffolding —
+`CONTRIBUTING.md`, issue and PR templates, dependency bots — is deliberately
+deferred to its own section at the bottom, to pick up later.
 
 ---
 
@@ -30,25 +35,44 @@ were mis-stated when this list was written.
 
 - [x] **GitHub token in the git URL.** Replaced with a `credential.helper` shell function that reads the token from `SHIPIT_GIT_TOKEN` in the environment (`apps/shipyard/src/git/clone-repo.ts`). Passed via `-c`, so it is never an argument, never in the URL, and never written to `<clone>/.git/config` — the after-the-fact `remote set-url` scrub is gone with it.
 - [x] **Redis failure is silent.** `enqueueBuild` now fails fast with a typed `QueueUnavailableError` instead of buffering against a dead socket; `GET /api/v1/health` reports `checks.redis` and answers 503 when it's down; project creation pre-checks the queue and refuses with 503 before writing anything; and a redeploy that can't be queued marks its row `FAILED` rather than leaving a phantom `QUEUED` no worker will ever pick up.
-- [x] **Command injection — re-assessed, not a host RCE.** The string reaches `/bin/sh -c` *inside the throwaway build container*, and `npm run build` already runs whatever the repo's `package.json` says: the container is the trust boundary, not the command string, so there is no privilege here the project owner doesn't already have. The "pre-auth" framing was also wrong — it needs an authenticated user who owns the project. What was genuinely missing was container hardening, now added: `CapDrop: ["ALL"]` and `SecurityOpt: ["no-new-privileges"]`. Single-line and length limits on the commands were already enforced by `command()` in `@repo/shared/validation/project`.
+- [x] **Command injection — re-assessed, not a host RCE.** The string reaches `/bin/sh -c` _inside the throwaway build container_, and `npm run build` already runs whatever the repo's `package.json` says: the container is the trust boundary, not the command string, so there is no privilege here the project owner doesn't already have. The "pre-auth" framing was also wrong — it needs an authenticated user who owns the project. What was genuinely missing was container hardening, now added: `CapDrop: ["ALL"]` and `SecurityOpt: ["no-new-privileges"]`. Single-line and length limits on the commands were already enforced by `command()` in `@repo/shared/validation/project`.
 - [x] **Validation covers one endpoint — this was wrong.** Written from a grep that only searched `apps/backend/src`. Every write path was already validated: `createProjectSchema` on `POST /api/v1/new`, `updateProjectSchema` on the web `PATCH /api/projects/:id` (build config included), and `normalizeEnvVars()` on `PUT /projects/:id/env`. Redeploy takes no body. Every controller also gates on `projectService.getOwnedProject(id, req.user.id)`.
 
 **Not verified:** `CapDrop: ["ALL"]` was type-checked and built but never run against a live Docker daemon — if a build starts failing on a permission error, that line is the first suspect. The authenticated 503 branches were reasoned through rather than exercised; the `isQueueReady()` predicate behind them is confirmed working via the health endpoint.
 
+## Next up — portfolio ready
+
+The short list that changes how this repo reads to someone spending two minutes
+on it. Everything else can wait.
+
+- [ ] **Screenshots in the README.** Signed in, dark theme: the project list with
+      mixed statuses, a deployment's stage timeline + streaming logs, the import
+      flow, and the environment page with values masked. Highest value per minute
+      on this page — nobody clones a repo, they look at pictures.
+- [ ] **Walk the app signed in.** Nothing built recently — command palette,
+      project switcher, mobile action bar, the Expo palette swap, the 503 paths —
+      has been opened in a browser. It type-checks and builds; that isn't the same
+      thing.
+- [ ] **One integration test.** Mock git repo + local Docker → does a build
+      complete and produce S3 artifacts? Covers every layer at once, and "no
+      tests" is the first thing a reviewing engineer notices.
+- [ ] **GitHub Actions CI.** install → lint → type-check → build. Small, and the
+      green check is visible from the repo page.
+
 ## Before launch
 
-- [ ] Docker Compose for local dev (Postgres, Redis, MinIO) — today a contributor provisions three services by hand before anything runs
+Ordered by what actually bites first.
+
+- [ ] Structured logging (Pino) with `deploymentId` and a request ID in context — a failed production build is currently unsearchable
 - [ ] `helmet` security headers
-- [ ] Validate required env vars at process startup in backend and shipyard
-- [ ] Rate limiting on project creation and the deployment trigger
 - [ ] Request body size limit — `express.json({ limit: "1mb" })`
-- [ ] GitHub Actions CI: install → lint → type-check → build on every push and PR
-- [ ] Structured logging (Pino) with `deploymentId` and a request ID in context
-- [ ] Integration test for the pipeline: mock git repo + local Docker → does a build complete and produce S3 artifacts? MinIO or LocalStack stands in for S3
+- [ ] Rate limiting on project creation and the deployment trigger
+- [ ] Validate required env vars at process startup in backend and shipyard
 - [ ] S3 upload parallelism — `build-in-container.ts:451` awaits each file in sequence
 - [ ] Dead-letter queue — `recoverStaleBuilds()` requeues on restart but nothing handles repeated failure
 - [ ] Health endpoint on shipyard (backend and proxy already have one) reporting Redis, DB and Docker daemon status
 - [ ] Sentry or equivalent error tracking
+- [ ] Docker Compose for local dev (Postgres, Redis, MinIO) — _parked by choice; it's the one item that blocks anyone else from running the project at all_
 
 ## Frontend
 
@@ -63,6 +87,8 @@ Closed 2026-08-22:
 Still open:
 
 - [ ] `/dashboard` redirects to `/projects`. Only build it once there's something to show: deploy frequency, success rate, build-time trend, storage used. Until then the redirect is the honest answer.
+
+**Not verified:** none of this was opened in a browser — it type-checks and builds, but the palette, switcher and mobile bar have not been clicked. The mobile bar in particular is untested at 375px, which was already on the _Not yet verified_ list below.
 
 ## Features
 
@@ -94,14 +120,14 @@ Still open:
 - [ ] Multi-region deploys
 - [ ] SOC 2 readiness
 
-## Repo & contributor experience
+## Repo hygiene
 
-- [ ] `CONTRIBUTING.md` — monorepo layout, which package owns what, branch and PR convention, what to run before pushing
-- [ ] README needs one-command setup, the pipeline diagram above the fold, and the env-var table (`CLAUDE.md` has the table; the README links neither it nor `docs/`)
-- [ ] `.github/ISSUE_TEMPLATE/` and `pull_request_template.md`
+Worth doing while this is still a personal project.
+
 - [ ] `.husky/pre-commit` runs only `pnpm format` — add `pnpm lint && pnpm check-types`
-- [ ] `pnpm audit` in CI, plus `gitleaks` or `trufflehog` against accidental secret commits; Dependabot or Renovate for updates
 - [ ] Pin the build image to a digest instead of the `node:20-alpine` tag
+- [ ] `pnpm audit` in CI, plus `gitleaks` or `trufflehog` against accidental secret commits
+- [ ] README needs the pipeline diagram above the fold and the env-var table (`CLAUDE.md` has the table; the README links neither it nor `docs/`)
 - [ ] API response envelope standardization; OpenAPI spec
 
 **Refactors**
@@ -109,6 +135,16 @@ Still open:
 - [ ] Finish splitting `build-in-container.ts` — cloning, env injection, framework prep and the S3 client are extracted to `git/`, `env/`, `frameworks/` and `aws.ts`, but container creation, log streaming and the upload loop still share one file. Extract `createBuildContainer()`, `streamContainerLogs()`, `uploadBuildArtifacts()` — and rename the file `run-build.ts` once it only builds
 - [ ] Split `new-project.controller.ts` into `search-repos.controller.ts` and `create-project.controller.ts` — two unrelated controllers share the file
 - [ ] `apps/web/app/api/projects/**` calls Prisma directly; the backend's `services/` convention should apply here too
+
+## Open source — deferred
+
+Picked up later, once the portfolio pass is done. Until then it's scaffolding
+nobody reviewing a personal project reads.
+
+- [ ] `CONTRIBUTING.md` — monorepo layout, which package owns what, branch and PR convention, what to run before pushing
+- [ ] `.github/ISSUE_TEMPLATE/` and `pull_request_template.md`
+- [ ] Dependabot or Renovate for automated dependency updates
+- [ ] A hosted demo — the build worker needs a Docker daemon, so this means a VPS, not a free tier
 
 ---
 
