@@ -5,7 +5,8 @@ import rateLimit, { ipKeyGenerator } from "express-rate-limit";
 // account behind a shared NAT shouldn't be able to exhaust everyone else's quota.
 // Falls back to the IP helper — which normalises IPv6 to a /56 — if `req.user`
 // is somehow absent, so the limiter can never key everything to `undefined`.
-const byUser = (req: Request) => req.user?.id ?? ipKeyGenerator(req.ip ?? "", 56);
+const byUser = (req: Request) =>
+  req.user?.id ?? ipKeyGenerator(req.ip ?? "", 56);
 
 const message = (retryAfterSeconds: number) => ({
   success: false,

@@ -27,6 +27,14 @@ DESIGN.md analyses a **marketing site**; ShipIt is a dark-first application. Thr
 
 To replace all of this with a generated palette, typography, and voice, run `/brand-design` or say "pick brand colors". It will detect this deferred state, skip the overwrite confirmation, and rewrite both `globals.css` and this file.
 
+## Motion
+
+100ms for hover and press feedback, 150ms for popovers, 200–250ms for dialogs and
+sheets. Entrances longer than exits, on the single `--ease-shipit` curve. Never
+`linear`, never `transition: all` — name the properties. See
+[reveal.tsx](apps/web/components/landing/reveal.tsx) for reduced motion: it
+renders the final state with zero movement.
+
 Open design work — the unused type scale, the two vendored primitives that still
 carry `transition-all` — is tracked in [ROADMAP.md](ROADMAP.md) under **Frontend**.
 

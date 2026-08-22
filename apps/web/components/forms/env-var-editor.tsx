@@ -65,16 +65,20 @@ export function EnvVarEditor({ rows, onChange, disabled }: EnvVarEditorProps) {
       {rows.length > 0 && (
         <div className="space-y-2">
           {rows.map((row, index) => (
-            <div key={index} className="flex items-start gap-2">
+            <div key={index} className="flex flex-wrap items-start gap-2">
+              {/* Both fields need an explicit flex basis. Input carries w-full,
+                  so a key with no flex rule claimed the whole row and left the
+                  value's flex-1 with nothing but the reveal button. Values are
+                  longer than keys, hence the 1 : 1.6 split. */}
               <Input
                 aria-label={`Variable name ${index + 1}`}
                 placeholder="VITE_API_URL"
-                className="font-mono text-sm"
+                className="min-w-0 flex-[1_1_11rem] font-mono text-sm"
                 value={row.key}
                 disabled={disabled}
                 onChange={(e) => update(index, { key: e.target.value })}
               />
-              <div className="relative flex-1">
+              <div className="relative min-w-0 flex-[1.6_1_15rem]">
                 <Input
                   aria-label={`Value for ${row.key || `variable ${index + 1}`}`}
                   // Never type="password": Chrome and Brave deliberately ignore
@@ -118,6 +122,7 @@ export function EnvVarEditor({ rows, onChange, disabled }: EnvVarEditorProps) {
                 type="button"
                 variant="ghost"
                 size="icon"
+                className="shrink-0"
                 disabled={disabled}
                 onClick={() => remove(index)}
                 aria-label={`Remove ${row.key || `variable ${index + 1}`}`}

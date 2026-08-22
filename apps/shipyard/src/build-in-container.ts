@@ -104,7 +104,10 @@ class LogSink {
         })),
       });
     } catch (e) {
-      deploymentLogger(this.deploymentId).error({ err: e }, "Could not persist deployment logs");
+      deploymentLogger(this.deploymentId).error(
+        { err: e },
+        "Could not persist deployment logs",
+      );
     }
   }
 
@@ -406,7 +409,10 @@ export const buildInContainer = async (
     let timedOut = false;
     const timer = setTimeout(() => {
       timedOut = true;
-      log.error({ timeoutMs: BUILD_TIMEOUT_MS }, "Build exceeded timeout — stopping container");
+      log.error(
+        { timeoutMs: BUILD_TIMEOUT_MS },
+        "Build exceeded timeout — stopping container",
+      );
       logs.line(`Build timed out after ${BUILD_TIMEOUT_MS / 1000}s`);
       // AutoRemove cleans up once stopped; fall back to kill if stop fails.
       container.stop({ t: 0 }).catch(() => container.kill().catch(() => {}));

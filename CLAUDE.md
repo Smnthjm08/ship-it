@@ -73,6 +73,23 @@ There are no tests in this project yet.
 - `Project` → `EnvVar` (one-to-many, unique on `[projectId, key]`, hard-deleted and cascading)
 - `Account.accessToken` holds the GitHub OAuth token used by Shipyard to clone repos
 
+### Frontend routes
+
+The sidebar is context-aware: account-wide at the top level, project-scoped once
+you open a project.
+
+| Account level                | Project level                            |
+| ---------------------------- | ---------------------------------------- |
+| `/projects`                  | `/projects/[id]` — overview              |
+| `/deployments` (all projects)| `/projects/[id]/deployments`             |
+| `/settings/account`          | `/projects/[id]/environment`             |
+|                              | `/projects/[id]/settings`                |
+
+`/` is landing only; signed-in users go to `/projects`. `/dashboard` redirects to
+`/projects`. There is no back link inside a project — the header breadcrumb's
+`Projects` crumb is the escape hatch and the sidebar's project switcher moves
+sideways.
+
 ### Next.js projects
 
 There is no Node runtime, so the only deployable Next build is a static export. `apps/shipyard/src/frameworks/nextjs.ts` runs before the build container starts and makes that happen without the user editing their repo:

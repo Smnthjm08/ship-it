@@ -44,7 +44,12 @@ v1Router.get("/health", (_req: Request, res: Response) => {
 
 // Repo search + project creation (the "import a repo" flow).
 v1Router.get("/new", authMiddleware, githubSearchLimiter, newProjectController);
-v1Router.post("/new", authMiddleware, createProjectLimiter, createProjectController);
+v1Router.post(
+  "/new",
+  authMiddleware,
+  createProjectLimiter,
+  createProjectController,
+);
 
 // Projects
 v1Router.get("/projects", authMiddleware, listProjectsController);

@@ -113,7 +113,8 @@ app.use((req: Request, res: Response) => {
 app.use((err: Error, req: Request, res: Response, _next: NextFunction) => {
   // body-parser rejects an oversized body with a typed 413 — answering 500 would
   // read as "we broke" when the correct answer is "your request was too large".
-  const status = (err as { status?: number; statusCode?: number }).status ?? 500;
+  const status =
+    (err as { status?: number; statusCode?: number }).status ?? 500;
   if (status === 413) {
     return res.status(413).json({
       success: false,
