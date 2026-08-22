@@ -16,21 +16,24 @@ The frontend journey that used to break on a failed build is closed: build confi
 is editable, status has one vocabulary, the log viewer is real, and the sidebar
 follows project context.
 
-What's missing is the hardening layer. There is an active command-injection
-vector, validation on exactly one endpoint, no tests, no CI, no structured
-logging, and no rate limiting. That gap — between the architecture's ambition and
-the execution's maturity — is still the defining finding.
+What's missing is the hardening layer. The blockers below are closed, but there
+are still no tests, no CI, no structured logging, no rate limiting and no
+one-command local setup. That gap — between the architecture's ambition and the
+operational maturity around it — is the remaining finding.
 
 ---
 
 ## Blockers
 
-Not shippable publicly until these are closed.
+Closed 2026-08-22 — kept here with what was actually done, since two of the four
+were mis-stated when this list was written.
 
-- [ ] **Command injection.** `apps/shipyard/src/build-in-container.ts:322` interpolates user-supplied `buildCommand` and `installCommand` into `["/bin/sh", "-c", ...]`. Pre-auth RCE for anything exposing the deployment API. Use the array exec form.
-- [ ] **GitHub token in the git URL.** `apps/shipyard/src/git/clone-repo.ts:31` embeds the OAuth token as `https://oauth2:<token>@github.com/...`. The remote is rewritten afterwards so the build can't read it, but during the clone it still reaches git error messages, stack traces and process listings. Move to a credential helper or `GIT_ASKPASS`.
-- [ ] **Validation covers one endpoint.** `@repo/shared/validation/project` exists and `createProjectController` calls `safeParse`; deployments, env vars and build config still destructure `req.body` directly.
-- [ ] **Redis failure is silent.** `connectRedis().catch(console.error)` in `apps/backend/src/index.ts:12` lets the backend serve requests with a broken queue.
+- [x] **GitHub token in the git URL.** Replaced with a `credential.helper` shell function that reads the token from `SHIPIT_GIT_TOKEN` in the environment (`apps/shipyard/src/git/clone-repo.ts`). Passed via `-c`, so it is never an argument, never in the URL, and never written to `<clone>/.git/config` — the after-the-fact `remote set-url` scrub is gone with it.
+- [x] **Redis failure is silent.** `enqueueBuild` now fails fast with a typed `QueueUnavailableError` instead of buffering against a dead socket; `GET /api/v1/health` reports `checks.redis` and answers 503 when it's down; project creation pre-checks the queue and refuses with 503 before writing anything; and a redeploy that can't be queued marks its row `FAILED` rather than leaving a phantom `QUEUED` no worker will ever pick up.
+- [x] **Command injection — re-assessed, not a host RCE.** The string reaches `/bin/sh -c` *inside the throwaway build container*, and `npm run build` already runs whatever the repo's `package.json` says: the container is the trust boundary, not the command string, so there is no privilege here the project owner doesn't already have. The "pre-auth" framing was also wrong — it needs an authenticated user who owns the project. What was genuinely missing was container hardening, now added: `CapDrop: ["ALL"]` and `SecurityOpt: ["no-new-privileges"]`. Single-line and length limits on the commands were already enforced by `command()` in `@repo/shared/validation/project`.
+- [x] **Validation covers one endpoint — this was wrong.** Written from a grep that only searched `apps/backend/src`. Every write path was already validated: `createProjectSchema` on `POST /api/v1/new`, `updateProjectSchema` on the web `PATCH /api/projects/:id` (build config included), and `normalizeEnvVars()` on `PUT /projects/:id/env`. Redeploy takes no body. Every controller also gates on `projectService.getOwnedProject(id, req.user.id)`.
+
+**Not verified:** `CapDrop: ["ALL"]` was type-checked and built but never run against a live Docker daemon — if a build starts failing on a permission error, that line is the first suspect. The authenticated 503 branches were reasoned through rather than exercised; the `isQueueReady()` predicate behind them is confirmed working via the health endpoint.
 
 ## Before launch
 
@@ -49,11 +52,16 @@ Not shippable publicly until these are closed.
 
 ## Frontend
 
-- [ ] ⌘K command palette — `command.tsx` is installed, never built
-- [ ] Project switcher dropdown — the header breadcrumb is currently the only way to move between projects
-- [ ] Sticky mobile action bar so the project-level primary action isn't behind a hamburger
-- [ ] **Use the type scale.** `globals.css` defines `.text-display-*` / `.text-title-*` / `.text-body-*` and nothing imports them; every page title is an ad-hoc `text-2xl font-semibold tracking-tight`. Sizes are at least consistent across routes, so this is cosmetic debt — but the scale is dead code until something uses it.
-- [ ] **Vendored primitives still carry `transition-all`** — [accordion.tsx](apps/web/components/ui/accordion.tsx#L45) and [tabs.tsx](apps/web/components/ui/tabs.tsx#L66) came that way from shadcn. App code is clean.
+Closed 2026-08-22:
+
+- [x] **⌘K command palette.** `components/globals/command-palette.tsx` — global ⌘K/Ctrl-K, mounted once in `AppShell` so it works in both shells. Jumps to any project, the top-level routes, the current project's four sections, Redeploy, and the theme. Projects load on first open, not on mount. A `Search… ⌘K` button in both headers makes the shortcut discoverable.
+- [x] **Project switcher.** `components/globals/project-switcher.tsx` replaces the static identity chip in the project sidebar — a Popover + Command combobox with live status dots and a check on the current project. Works in collapsed icon mode, so switching never means expanding the sidebar first.
+- [x] **Sticky mobile action bar.** `components/globals/mobile-action-bar.tsx` pins Redeploy at the bottom below `md`, where the sidebar is a sheet and the section's main action was otherwise behind a hamburger. Clears the iOS home indicator via `env(safe-area-inset-bottom)`.
+- [x] **Type scale is in use.** All ten page titles moved from ad-hoc `text-2xl font-semibold tracking-tight` to `.text-display-sm`, so the scale is no longer dead code. 24px → 22px with the design system's -0.5px tracking.
+- [x] **`transition-all` is gone** — and there was more of it than this list claimed: `button.tsx`, `switch.tsx`, `sidebar.tsx` and `navigation-menu.tsx` (×2) as well as the two named. All now name their properties.
+
+Still open:
+
 - [ ] `/dashboard` redirects to `/projects`. Only build it once there's something to show: deploy frequency, success rate, build-time trend, storage used. Until then the redirect is the honest answer.
 
 ## Features
@@ -177,8 +185,8 @@ The 2026-07-31 frontend work passed types, lint, production build, route
 existence, the custom 404, the `/dashboard` redirect and an anti-slop repo scan.
 These were never checked and still haven't been:
 
-| Not checked | Why |
-| --- | --- |
-| Authenticated screens, visually | Needs a signed-in browser session. Log in at `localhost:3000` and walk the flow — project list, a project, a failed build, the environment page |
-| Live polling under a running build | Needs Redis, Docker and the Shipyard worker going at once |
-| Mobile card list at 375px | Never opened in a device viewport |
+| Not checked                        | Why                                                                                                                                             |
+| ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| Authenticated screens, visually    | Needs a signed-in browser session. Log in at `localhost:3000` and walk the flow — project list, a project, a failed build, the environment page |
+| Live polling under a running build | Needs Redis, Docker and the Shipyard worker going at once                                                                                       |
+| Mobile card list at 375px          | Never opened in a device viewport                                                                                                               |

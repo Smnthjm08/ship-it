@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { QueueUnavailableError } from "@repo/shared";
 import { deploymentService } from "../services/deployment.service";
 import { projectService } from "../services/project.service";
 
@@ -87,6 +88,14 @@ export const redeployController = async (req: Request, res: Response) => {
       error: null,
     });
   } catch (error) {
+    if (error instanceof QueueUnavailableError) {
+      return res.status(503).json({
+        message:
+          "Build queue is temporarily unavailable. Try again in a moment.",
+        data: null,
+        error: error.message,
+      });
+    }
     console.error("Error queueing deployment:", error);
     return res.status(500).json({
       message: "Internal server error",

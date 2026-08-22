@@ -37,14 +37,9 @@ const TERMINAL_STATUSES = ["COMPLETED", "FAILED"];
 const ERROR_PATTERN =
   /\b(error|failed|failure|npm ERR|ELIFECYCLE|ENOENT|exit code [1-9])\b/i;
 
-/**
- * Live build output.
- *
- * Streams from ws-server and falls back to polling the REST endpoint when the
- * socket can't be established, so logs still appear when ws-server is down.
- * Everything around the stream — search, copy, download, jump-to-error — is
- * what makes a failed build diagnosable instead of just visible.
- */
+// Streams from ws-server, falling back to polling REST when the socket won't
+// open, so logs still appear if ws-server is down. Search, copy, download and
+// jump-to-error are what make a failed build diagnosable instead of just visible.
 export function DeploymentLogs({
   deploymentId,
   initialLogs,

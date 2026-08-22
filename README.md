@@ -165,9 +165,9 @@ This project focuses on **infra + system design fundamentals** behind modern dep
 
 ## 📋 Project docs
 
-| Doc                          | What's in it                                                     |
-| ---------------------------- | ---------------------------------------------------------------- |
-| [ROADMAP.md](ROADMAP.md)     | Open work — blockers, pre-launch hardening, features, refactors  |
-| [DESIGN.md](DESIGN.md)       | The design system: colours, typography, radius, components       |
-| [brand.md](brand.md)         | How that system is wired into `globals.css`, and where it departs |
-| [CLAUDE.md](CLAUDE.md)       | Architecture, conventions and pitfalls                           |
+| Doc                      | What's in it                                                      |
+| ------------------------ | ----------------------------------------------------------------- |
+| [ROADMAP.md](ROADMAP.md) | Open work — blockers, pre-launch hardening, features, refactors   |
+| [DESIGN.md](DESIGN.md)   | The design system: colours, typography, radius, components        |
+| [brand.md](brand.md)     | How that system is wired into `globals.css`, and where it departs |
+| [CLAUDE.md](CLAUDE.md)   | Architecture, conventions and pitfalls                            |

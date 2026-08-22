@@ -45,7 +45,7 @@ export default async function EnvironmentPage({
   return (
     <div className="flex max-w-3xl flex-col gap-6">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Environment</h1>
+        <h1 className="text-display-sm">Environment</h1>
         <p className="text-muted-foreground mt-1 text-sm">
           Variables written to <code className="font-machine">.env</code> in
           your project root and exported to the build.

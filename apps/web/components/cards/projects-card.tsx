@@ -20,14 +20,9 @@ interface ProjectsCardProps {
   project: ProjectTypes;
 }
 
-/**
- * A project in the list. The card answers one question — "is it healthy?" — so
- * deployment status leads and repo metadata follows.
- *
- * The whole card is the link. The GitHub button sits above it as a nested
- * action, which is why the card itself is a plain element with a stretched
- * anchor rather than a wrapping <a>.
- */
+// Answers one question — "is it healthy?" — so status leads and repo metadata
+// follows. The whole card is the link, via a stretched anchor rather than a
+// wrapping <a>, so the GitHub button can nest inside it.
 export default function ProjectsCard({ project }: ProjectsCardProps) {
   const latestDeployment = project.deployments?.[0];
 

@@ -10,12 +10,8 @@ export interface StoredEnvVar {
   value: string;
 }
 
-/**
- * Decrypt the project's variables for this build.
- *
- * A decryption failure is fatal on purpose: silently building without a
- * variable produces a deployment that looks fine and is broken at runtime.
- */
+// Decryption failure is fatal on purpose: building without a variable produces
+// a deployment that looks fine and is broken at runtime.
 export function decryptProjectEnv(stored: StoredEnvVar[]): EnvVarPair[] {
   return stored.map(({ key, value }) => {
     try {
@@ -29,13 +25,9 @@ export function decryptProjectEnv(stored: StoredEnvVar[]): EnvVarPair[] {
   });
 }
 
-/**
- * Write the variables to `<buildPath>/.env` so file-based loaders (Vite, CRA,
- * dotenv) pick them up. Any variables already committed to the repo are kept
- * unless the project overrides them — platform values win.
- *
- * Returns the keys that came from the repo's own `.env`, for logging.
- */
+// Writes `<buildPath>/.env` for file-based loaders (Vite, CRA, dotenv). Repo-
+// committed vars are kept unless the project overrides them. Returns the keys
+// that came from the repo's own `.env`, for logging.
 export function writeDotEnvFile(
   buildPath: string,
   vars: EnvVarPair[],

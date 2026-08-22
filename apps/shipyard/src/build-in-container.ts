@@ -142,18 +142,10 @@ function invokes(command: string, tool: string): boolean {
   return new RegExp(`(?:^|[\\s;&|(])${tool}(?:[\\s;&|)]|$)`).test(command);
 }
 
-/**
- * Shell run before the install and build commands to provide the package
- * manager they ask for.
- *
- * `node:20-alpine` ships npm and corepack only. Corepack can enable pnpm and
- * yarn, but bun is not a corepack-managed package manager and has to be
- * installed from npm — without this a project configured for bun dies on
- * `bun: not found` after the container has already started.
- *
- * Driven by the resolved commands rather than the detected lockfile, because
- * the user is free to type `bun install` in a repo with no bun lockfile.
- */
+// node:20-alpine ships npm and corepack only. Corepack covers pnpm and yarn;
+// bun isn't corepack-managed and needs installing from npm, or the container
+// starts and then dies on `bun: not found`. Keyed off the resolved commands, not
+// the lockfile — a user can type `bun install` in a repo with no bun lockfile.
 export function toolchainPrelude(commands: string): string {
   const steps: string[] = [];
 
@@ -186,15 +178,10 @@ function producedDirs(buildPath: string): string[] {
   }
 }
 
-/**
- * Work out which directory to upload.
- *
- * The proxy serves plain files out of S3 — there is no Node runtime — so a
- * Next.js project only deploys if it was built with `output: "export"`, which
- * emits a static `out/`. `prepareNextProject()` configures that before the
- * build; if a `.next` still shows up with no static output, fail loudly instead
- * of uploading a directory that can never be served.
- */
+// Which directory to upload. No Node runtime, so a Next project only deploys if
+// built with `output: "export"` (a static `out/`). `prepareNextProject()` sets
+// that up; a bare `.next` with no static output fails loudly rather than
+// uploading something that can never be served.
 function resolveOutputDir(
   buildPath: string,
   outputDir: string,
@@ -319,6 +306,11 @@ export const buildInContainer = async (
       }
     }
 
+    // A shell is required: these are user-configured command *strings* that
+    // legitimately chain (`npm run build && npm run export`), so there is no
+    // argv to exec directly. Both strings are validated single-line and
+    // length-capped by `command()` in @repo/shared/validation/project, which is
+    // what stops a newline forging extra lines in the build log below.
     const cmd = ["/bin/sh", "-c", `${prelude}${installCmd} && ${buildCmd}`];
     console.log(`Executing command: ${cmd.join(" ")}`);
     logs.line(`$ ${installCmd} && ${buildCmd}`);
@@ -372,6 +364,13 @@ export const buildInContainer = async (
         MemorySwap: 2 * 1024 * 1024 * 1024, // no extra swap beyond Memory
         NanoCpus: 2 * 1_000_000_000, // 2 CPUs
         PidsLimit: 512,
+        // The command below is arbitrary by design — `npm run build` runs
+        // whatever the repo's package.json says, so the container is the trust
+        // boundary, not the command string. Narrow what that boundary allows:
+        // a build needs no Linux capabilities, and must never be able to gain
+        // more privilege than it started with via a setuid binary.
+        CapDrop: ["ALL"],
+        SecurityOpt: ["no-new-privileges"],
       },
       WorkingDir: WORKDIR,
     });

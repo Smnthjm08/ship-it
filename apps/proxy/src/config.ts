@@ -1,21 +1,11 @@
-/**
- * Proxy configuration.
- *
- * `PROXY_PORT` is read before `PORT` because `PORT` is a global Turborepo env
- * var already claimed by the backend — sharing it would make both servers try
- * to bind the same port in a single-process host.
- */
+// `PROXY_PORT` before `PORT`: `PORT` is a Turborepo global already claimed by
+// the backend, so sharing it makes both servers bind the same port.
 export const PORT = Number(process.env.PROXY_PORT || process.env.PORT) || 8001;
 
-/**
- * The wildcard domain deployments are served under, e.g. `shipit.dev` so that
- * `<deployment-id>.shipit.dev` resolves. Leave unset for local development,
- * where any `<id>.localhost` host works.
- *
- * When set, a request whose host isn't a direct child of this domain is
- * rejected instead of being parsed for a subdomain — that stops the apex and
- * unrelated hosts pointed at this server from resolving to someone's site.
- */
+// Wildcard domain deployments are served under (`shipit.dev` → `<id>.shipit.dev`).
+// Unset for local dev, where any `<id>.localhost` works. When set, hosts that
+// aren't a direct child are rejected rather than parsed — otherwise the apex and
+// any unrelated host pointed here would resolve to someone's site.
 export const BASE_DOMAIN = (process.env.DEPLOY_BASE_DOMAIN || "")
   .trim()
   .toLowerCase()
@@ -25,15 +15,12 @@ export const BASE_DOMAIN = (process.env.DEPLOY_BASE_DOMAIN || "")
 export const ROUTE_CACHE_TTL_MS =
   Number(process.env.PROXY_ROUTE_CACHE_TTL_MS) || 30_000;
 
-/**
- * Negative and in-progress lookups get a much shorter TTL so a site appears
- * promptly once its first build finishes.
- */
+/** Shorter, so a site appears promptly once its first build finishes. */
 export const ROUTE_CACHE_MISS_TTL_MS =
   Number(process.env.PROXY_ROUTE_CACHE_MISS_TTL_MS) || 5_000;
 
-/** Upper bound on cached routes, so a flood of bogus hosts can't grow the map forever. */
+/** Bounded so a flood of bogus hosts can't grow the map forever. */
 export const ROUTE_CACHE_MAX_ENTRIES = 5_000;
 
-/** Path reserved for health checks; namespaced so it can't collide with a user's file. */
+/** Namespaced so it can't collide with a user's file. */
 export const HEALTH_PATH = "/__shipit/health";

@@ -34,12 +34,8 @@ export const listEnvVarsController = async (req: Request, res: Response) => {
   }
 };
 
-/**
- * PUT /projects/:projectId/env
- * Body: `{ envVars: [{ key, value? }] }` — the complete desired set. Omit
- * `value` to keep the stored secret; omit the key entirely to delete it.
- * Takes effect on the next deployment.
- */
+// PUT /projects/:projectId/env — body is the complete desired set. Omit `value`
+// to keep the stored secret, omit the key to delete it. Applies on next deploy.
 export const replaceEnvVarsController = async (req: Request, res: Response) => {
   try {
     const projectId = req.params.projectId!;

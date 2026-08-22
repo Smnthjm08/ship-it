@@ -23,14 +23,8 @@ function getInitials(name: string) {
     .slice(0, 2);
 }
 
-/**
- * Account details, read-only.
- *
- * There used to be an edit mode whose Save handler only called console.log —
- * a control that looks like it works and doesn't is worse than no control.
- * Name and email come from GitHub, so this page links out rather than
- * pretending to own them.
- */
+// Read-only: name and email come from GitHub, so this links out rather than
+// pretending to own them. The old edit mode's Save only called console.log.
 export function ProfileView() {
   const { user } = useAuth();
 
@@ -39,7 +33,7 @@ export function ProfileView() {
   return (
     <main className="container mx-auto max-w-2xl px-4 py-8 md:py-10">
       <div className="mb-8">
-        <h1 className="text-2xl font-semibold tracking-tight">Account</h1>
+        <h1 className="text-display-sm">Account</h1>
         <p className="text-muted-foreground mt-1 text-sm">
           Your ShipIt account, connected through GitHub.
         </p>

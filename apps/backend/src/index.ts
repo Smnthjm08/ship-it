@@ -9,8 +9,16 @@ import v1Router from "./routes/index";
 
 import { connectRedis } from "@repo/shared";
 
+// Not fatal on purpose: auth and every read path still work without Redis, and
+// exiting here would take the whole API down over a queue outage. What must not
+// happen is serving as if nothing is wrong — /api/v1/health reports the queue
+// and the enqueue paths answer 503, so a broken queue is visible rather than
+// silently swallowing deployments.
 connectRedis().catch((err) =>
-  console.error("Failed to connect to Redis:", err),
+  console.error(
+    "[startup] Redis is unreachable — deployments cannot be queued until it recovers:",
+    err,
+  ),
 );
 
 const app: Application = express();

@@ -1,4 +1,5 @@
 import { Router, Request, Response } from "express";
+import { isQueueReady } from "@repo/shared";
 import authMiddleware from "../middlewares/auth.middleware";
 import {
   newProjectController,
@@ -23,8 +24,15 @@ import {
 
 const v1Router: Router = Router();
 
+// Reports dependencies rather than just liveness: the process being up while
+// the build queue is down is exactly the state that used to go unnoticed.
 v1Router.get("/health", (_req: Request, res: Response) => {
-  res.json({ status: "OK", message: "healthy!" });
+  const queue = isQueueReady();
+  res.status(queue ? 200 : 503).json({
+    status: queue ? "OK" : "DEGRADED",
+    message: queue ? "healthy!" : "Redis is unreachable — builds cannot be queued",
+    checks: { redis: queue ? "up" : "down" },
+  });
 });
 
 // Repo search + project creation (the "import a repo" flow).

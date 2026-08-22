@@ -1,20 +1,10 @@
 import fs from "fs";
 import path from "path";
 
-/**
- * Next.js support for a static-only host.
- *
- * ShipIt serves files out of S3 — there is no Node runtime — so the only Next
- * build that can be deployed is a static export. Rather than making every user
- * hand-edit `next.config.js` before their first deploy (React and Vite need no
- * such thing), this module runs before the build container starts and:
- *
- *   1. refuses builds that can provably never be static, naming the file, and
- *   2. rewrites the project's Next config so `output: "export"` is set.
- *
- * Everything here writes into the throwaway clone, which the worker deletes
- * when the build ends. Nothing is pushed back to the user's repository.
- */
+// Next.js on a static-only host. There's no Node runtime, so a static export is
+// the only deployable Next build. Runs before the container starts: refuses builds
+// that can never be static (naming the file), then rewrites the config to set
+// `output: "export"`. Writes only into the throwaway clone, never the user's repo.
 
 const CONFIG_BASENAMES = [
   "next.config.js",
@@ -59,13 +49,8 @@ function readJson(file: string): Record<string, unknown> | null {
   }
 }
 
-/**
- * True when this directory is a Next.js project.
- *
- * Read from `package.json` rather than trusting the project's stored
- * `framework`, which is a guess the user made in a dropdown before the repo was
- * ever cloned.
- */
+// From package.json, not the stored `framework` — that's a dropdown guess made
+// before the repo was ever cloned.
 export function isNextProject(projectRoot: string): boolean {
   const pkg = readJson(path.join(projectRoot, "package.json"));
   if (!pkg) return false;
@@ -117,16 +102,10 @@ function readText(file: string): string {
   }
 }
 
-/**
- * Find the things that make a static export impossible.
- *
- * These are all cases `next build` would reject (or silently drop) anyway — the
- * point of finding them here is that it costs a second instead of a full
- * install-and-build, and the message names the offending file.
- *
- * Matching is textual. A false positive is cheap to explain; a false negative
- * just falls back to the build's own error.
- */
+// `next build` would reject these anyway; catching them here costs a second
+// instead of a full install-and-build, and names the offending file. Matching is
+// textual — a false positive is cheap to explain, a false negative just falls
+// through to the build's own error.
 export function findExportBlockers(projectRoot: string): NextBlocker[] {
   const blockers: NextBlocker[] = [];
   const rel = (file: string) =>
@@ -241,27 +220,15 @@ const nextConfig = {
 export default nextConfig;
 `;
 
-/**
- * A config that defers to the user's own and forces the settings a static
- * export needs.
- *
- * The wrapper's extension has to match the original's world, because Next loads
- * the two kinds of config through completely different pipelines:
- *
- * - `.js`/`.cjs`/`.mjs` are `import()`ed, so an `.mjs` wrapper reaches all
- *   three — CJS comes back through default interop, ESM as its default export.
- * - `.ts` is transpiled by Next's own SWC pass and `require`d from a string.
- *   That pass registers a `require.extensions` hook for `.ts` whenever the
- *   output contains `require(` (which our import compiles to), so a `.ts`
- *   wrapper can require the renamed original and it gets transpiled too. An
- *   `.mjs` wrapper could not: importing a `.ts` file is not something Node
- *   itself can do on the version the build container runs.
- *
- * The body is deliberately plain JavaScript with no annotations so the same
- * source is valid in both, and the original may export a (possibly async)
- * function of `(phase, context)`, so this always exports the function form and
- * resolves whichever shape it finds.
- */
+// Wraps the user's config and forces what a static export needs. The wrapper's
+// extension MUST match the original's, because Next loads the two kinds through
+// different pipelines:
+//   - `.js`/`.cjs`/`.mjs` are `import()`ed, so one `.mjs` wrapper reaches all three.
+//   - `.ts` is SWC-transpiled and `require`d from a string, which registers a
+//     `require.extensions` hook for `.ts` — so a `.ts` wrapper can require the
+//     renamed original. An `.mjs` wrapper cannot import a `.ts` file at all.
+// Body stays plain JS so one source is valid in both, and always exports the
+// function form since the original may be a (possibly async) `(phase, context)`.
 function wrapperConfig(
   originalSpecifier: string,
   isTypeScript: boolean,
@@ -337,13 +304,9 @@ export function configureStaticExport(projectRoot: string): ConfigureResult {
   return { action: "wrapped", file: wrapperName, original: originalName };
 }
 
-/**
- * Everything that has to happen for a Next.js project before the container
- * starts. No-op for every other framework.
- *
- * Throws when the project cannot be deployed statically — by design, before a
- * multi-minute install and build that was always going to fail.
- */
+// Everything a Next project needs before the container starts; no-op otherwise.
+// Throws when it can't deploy statically — deliberately, before a multi-minute
+// build that was always going to fail.
 export function prepareNextProject(projectRoot: string, log: Log): boolean {
   if (!isNextProject(projectRoot)) return false;
 

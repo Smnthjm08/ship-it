@@ -62,7 +62,7 @@ export default async function NewProjectPage({
       </Button>
 
       <div className="mt-6 mb-8">
-        <h1 className="text-2xl font-semibold tracking-tight">
+        <h1 className="text-display-sm">
           Import a repository
         </h1>
         <p className="text-muted-foreground mt-1 text-sm">

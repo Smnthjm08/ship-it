@@ -44,9 +44,7 @@ export default async function RootLayout({
       suppressContentEditableWarning
       suppressHydrationWarning
     >
-      <body
-        className={`${jetbrainsMono.variable} antialiased`}
-      >
+      <body className={`${jetbrainsMono.variable} antialiased`}>
         <TooltipProvider>
           <ThemeProvider
             attribute="class"

@@ -12,14 +12,47 @@ redisQueue.connect().catch((err: unknown) => {
   console.error("Failed to connect to Redis queue:", err);
 });
 
+/**
+ * The queue is unreachable. Distinct from a programming error so callers can
+ * answer 503 ("come back later") instead of 500 ("we're broken") — and so a
+ * deployment row is never left QUEUED for a job that was never enqueued.
+ */
+export class QueueUnavailableError extends Error {
+  constructor(cause?: unknown) {
+    super("Build queue is unavailable — Redis is not connected.");
+    this.name = "QueueUnavailableError";
+    this.cause = cause;
+  }
+}
+
+/**
+ * Whether the queue client is connected *right now*. node-redis buffers
+ * commands while it reconnects, so without this check an enqueue against a dead
+ * Redis hangs until the socket times out rather than failing fast.
+ */
+export function isQueueReady(): boolean {
+  return redisQueue.isReady;
+}
+
 /** Pending build jobs, newest pushed on the left, consumed from the right. */
 export const BUILD_QUEUE = "deploymentId";
 /** Jobs a worker has reserved but not finished yet. */
 export const BUILD_PROCESSING_QUEUE = "deploymentId:processing";
 
-/** Queue a deployment for the Shipyard worker. */
+/**
+ * Queue a deployment for the Shipyard worker.
+ *
+ * Throws `QueueUnavailableError` rather than letting a raw connection error
+ * escape: every caller has already written a `QUEUED` row by this point and
+ * needs to distinguish "retry later" from "this deployment is now a lie".
+ */
 export async function enqueueBuild(deploymentId: string): Promise<void> {
-  await redisQueue.lPush(BUILD_QUEUE, deploymentId);
+  if (!redisQueue.isReady) throw new QueueUnavailableError();
+  try {
+    await redisQueue.lPush(BUILD_QUEUE, deploymentId);
+  } catch (err) {
+    throw new QueueUnavailableError(err);
+  }
 }
 
 /**

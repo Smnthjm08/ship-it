@@ -17,14 +17,10 @@ export const realpathOrSelf = (target: string): string => {
   }
 };
 
-/**
- * Resolve a user-configured sub-path against a base, refusing anything that
- * escapes it. `rootDir` and `outputDir` come from the settings form and become
- * host paths — the output dir is what gets uploaded to a public bucket, so
- * `../../../../home/you/.ssh` would publish the host's keys. Symlinks are
- * resolved first: the build runs arbitrary commands in the clone, so
- * `ln -s / out` escapes just as well as `../`.
- */
+// Resolves a user-configured sub-path against a base, refusing escapes.
+// `rootDir`/`outputDir` come from the settings form and become host paths, and
+// the output dir is uploaded publicly — `../../home/you/.ssh` would publish the
+// host's keys. Symlinks resolve first: `ln -s / out` escapes as well as `../`.
 export function resolveWithin(
   base: string,
   segment: string,

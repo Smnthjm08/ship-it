@@ -61,7 +61,7 @@ export default async function DeploymentPage({ params }: DeploymentPageProps) {
             All deployments
           </Link>
 
-          <h1 className="truncate text-2xl font-semibold tracking-tight">
+          <h1 className="text-display-sm truncate">
             {deployment.project.name}
           </h1>
 

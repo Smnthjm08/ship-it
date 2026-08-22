@@ -14,12 +14,9 @@ const isVcsDir = (name: string) => name === ".git";
 const isInside = (candidate: string, root: string) =>
   candidate === root || candidate.startsWith(root + path.sep);
 
-/**
- * Collect every file under `dirPath` for upload, bounded by `root`. The build
- * runs arbitrary commands in the clone, so the output dir can hold a symlink to
- * anywhere on the host (`ln -s ~/.ssh out/keys`); following one would upload its
- * target to a public bucket.
- */
+// Every file under `dirPath`, bounded by `root`. The build runs arbitrary
+// commands, so the output dir can hold `ln -s ~/.ssh out/keys` — following that
+// would upload the target to a public bucket.
 export const getAllFiles = (
   dirPath: string,
   arrayOfFiles: string[] = [],

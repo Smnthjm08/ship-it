@@ -338,22 +338,22 @@ The brand's strongest visual signature is the **device-mockup hero** — a cente
 
 ### Hierarchy
 
-| Token | Size | Weight | Line Height | Letter Spacing | Use |
-| --- | --- | --- | --- | --- | --- |
-| `{typography.display-mega}` | 64px | 600 | 1.05 | -1.92px | Homepage hero h1 |
-| `{typography.display-xl}` | 48px | 600 | 1.1 | -1.44px | Subsidiary heroes |
-| `{typography.display-lg}` | 36px | 600 | 1.15 | -1.08px | Section heads |
-| `{typography.display-md}` | 28px | 600 | 1.2 | -0.84px | Sub-section heads |
-| `{typography.display-sm}` | 22px | 600 | 1.25 | -0.5px | Card group titles |
-| `{typography.title-md}` | 18px | 600 | 1.4 | 0 | Component titles |
-| `{typography.title-sm}` | 16px | 600 | 1.4 | 0 | List labels |
-| `{typography.body-md}` | 16px | 400 | 1.5 | 0 | Default body |
-| `{typography.body-sm}` | 14px | 400 | 1.5 | 0 | Footer body |
-| `{typography.caption}` | 13px | 400 | 1.4 | 0 | Photo captions |
-| `{typography.caption-uppercase}` | 11px | 600 | 1.4 | 0.88px | Section labels, badges |
-| `{typography.code}` | 13px | 400 | 1.5 | 0 | Code blocks — JetBrains Mono |
-| `{typography.button}` | 14px | 500 | 1.0 | 0 | CTA labels |
-| `{typography.nav-link}` | 14px | 500 | 1.4 | 0 | Top-nav menu |
+| Token                            | Size | Weight | Line Height | Letter Spacing | Use                          |
+| -------------------------------- | ---- | ------ | ----------- | -------------- | ---------------------------- |
+| `{typography.display-mega}`      | 64px | 600    | 1.05        | -1.92px        | Homepage hero h1             |
+| `{typography.display-xl}`        | 48px | 600    | 1.1         | -1.44px        | Subsidiary heroes            |
+| `{typography.display-lg}`        | 36px | 600    | 1.15        | -1.08px        | Section heads                |
+| `{typography.display-md}`        | 28px | 600    | 1.2         | -0.84px        | Sub-section heads            |
+| `{typography.display-sm}`        | 22px | 600    | 1.25        | -0.5px         | Card group titles            |
+| `{typography.title-md}`          | 18px | 600    | 1.4         | 0              | Component titles             |
+| `{typography.title-sm}`          | 16px | 600    | 1.4         | 0              | List labels                  |
+| `{typography.body-md}`           | 16px | 400    | 1.5         | 0              | Default body                 |
+| `{typography.body-sm}`           | 14px | 400    | 1.5         | 0              | Footer body                  |
+| `{typography.caption}`           | 13px | 400    | 1.4         | 0              | Photo captions               |
+| `{typography.caption-uppercase}` | 11px | 600    | 1.4         | 0.88px         | Section labels, badges       |
+| `{typography.code}`              | 13px | 400    | 1.5         | 0              | Code blocks — JetBrains Mono |
+| `{typography.button}`            | 14px | 500    | 1.0         | 0              | CTA labels                   |
+| `{typography.nav-link}`          | 14px | 500    | 1.4         | 0              | Top-nav menu                 |
 
 ### Principles
 
@@ -387,14 +387,14 @@ Generous editorial pacing. The white canvas does not compete with the hero's gra
 
 ## Elevation & Depth
 
-| Level | Treatment | Use |
-| --- | --- | --- |
-| Flat (canvas) | `{colors.canvas}` (#ffffff) | Body bands, footer |
-| Card | `{colors.surface-card}` (#ffffff) | Content cards |
-| Hairline border | 1px `{colors.hairline}` | Card outlines |
-| Soft drop | `0 4px 12px rgba(0, 0, 0, 0.04)` | Hovered cards (single shadow tier) |
-| Atmospheric gradient | Sky-blue radial wash | Hero backdrop only |
-| Dark inversion | `{colors.surface-dark}` (#171717) | Dark feature cards, code blocks, featured pricing |
+| Level                | Treatment                         | Use                                               |
+| -------------------- | --------------------------------- | ------------------------------------------------- |
+| Flat (canvas)        | `{colors.canvas}` (#ffffff)       | Body bands, footer                                |
+| Card                 | `{colors.surface-card}` (#ffffff) | Content cards                                     |
+| Hairline border      | 1px `{colors.hairline}`           | Card outlines                                     |
+| Soft drop            | `0 4px 12px rgba(0, 0, 0, 0.04)`  | Hovered cards (single shadow tier)                |
+| Atmospheric gradient | Sky-blue radial wash              | Hero backdrop only                                |
+| Dark inversion       | `{colors.surface-dark}` (#171717) | Dark feature cards, code blocks, featured pricing |
 
 ### Decorative Depth
 
@@ -405,17 +405,17 @@ Generous editorial pacing. The white canvas does not compete with the hero's gra
 
 ### Border Radius Scale
 
-| Token | Value | Use |
-| --- | --- | --- |
-| `{rounded.none}` | 0px | Reserved |
-| `{rounded.xs}` | 4px | Inline tags |
-| `{rounded.sm}` | 6px | Compact rows |
-| `{rounded.md}` | 8px | CTA buttons, form inputs, ecosystem tiles |
-| `{rounded.lg}` | 12px | Feature cards, code blocks, pricing tiers |
-| `{rounded.xl}` | 16px | Device mockup cards |
-| `{rounded.xxl}` | 24px | Larger atmospheric cards (rare) |
-| `{rounded.pill}` | 9999px | Badges only |
-| `{rounded.full}` | 9999px | Avatar plates (rare) |
+| Token            | Value  | Use                                       |
+| ---------------- | ------ | ----------------------------------------- |
+| `{rounded.none}` | 0px    | Reserved                                  |
+| `{rounded.xs}`   | 4px    | Inline tags                               |
+| `{rounded.sm}`   | 6px    | Compact rows                              |
+| `{rounded.md}`   | 8px    | CTA buttons, form inputs, ecosystem tiles |
+| `{rounded.lg}`   | 12px   | Feature cards, code blocks, pricing tiers |
+| `{rounded.xl}`   | 16px   | Device mockup cards                       |
+| `{rounded.xxl}`  | 24px   | Larger atmospheric cards (rare)           |
+| `{rounded.pill}` | 9999px | Badges only                               |
+| `{rounded.full}` | 9999px | Avatar plates (rare)                      |
 
 Compact developer-ergonomic radii — 8px CTAs, 12px cards. Pill geometry is reserved for badges, never CTAs.
 
@@ -507,12 +507,12 @@ Compact developer-ergonomic radii — 8px CTAs, 12px cards. Pill geometry is res
 
 ### Breakpoints
 
-| Name | Width | Key Changes |
-| --- | --- | --- |
-| Mobile | < 640px | Hero h1 64→32px; device mockup → single iPhone screen; feature grid 1-up; nav hamburger. |
-| Tablet | 640–1024px | Hero h1 48px; device mockup compresses; feature grid 2-up. |
-| Desktop | 1024–1280px | Full hero h1 64px; full MacBook + iPhone composite; feature grid 3-up. |
-| Wide | > 1280px | Content caps at 1200px. |
+| Name    | Width       | Key Changes                                                                              |
+| ------- | ----------- | ---------------------------------------------------------------------------------------- |
+| Mobile  | < 640px     | Hero h1 64→32px; device mockup → single iPhone screen; feature grid 1-up; nav hamburger. |
+| Tablet  | 640–1024px  | Hero h1 48px; device mockup compresses; feature grid 2-up.                               |
+| Desktop | 1024–1280px | Full hero h1 64px; full MacBook + iPhone composite; feature grid 3-up.                   |
+| Wide    | > 1280px    | Content caps at 1200px.                                                                  |
 
 ### Touch Targets
 

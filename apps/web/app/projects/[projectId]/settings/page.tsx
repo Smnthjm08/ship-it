@@ -37,7 +37,7 @@ export default async function ProjectSettingsPage({
   return (
     <div className="flex max-w-3xl flex-col gap-8">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Settings</h1>
+        <h1 className="text-display-sm">Settings</h1>
         <p className="text-muted-foreground mt-1 text-sm">
           Configuration for {project.name}. Build changes take effect on the
           next deployment.

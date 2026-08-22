@@ -6,13 +6,8 @@ import {
   ROUTE_CACHE_TTL_MS,
 } from "./config";
 
-/**
- * What a hostname resolves to.
- *
- * `pending` and `failed` are kept distinct from `unknown` so visitors get an
- * honest answer ("still building" / "the build failed") instead of a bare 404
- * that looks identical to a typo'd URL.
- */
+// `pending`/`failed` stay distinct from `unknown` so visitors get an honest
+// answer instead of a 404 that looks identical to a typo'd URL.
 export type Route =
   | { kind: "ready"; deploymentId: string }
   | { kind: "pending"; status: string }
@@ -26,13 +21,8 @@ interface CacheEntry {
 
 const cache = new Map<string, CacheEntry>();
 
-/**
- * Extract the deployment/project label from a host header.
- *
- * Returns null for hosts that must not resolve to a site: the apex, `www`, a
- * bare hostname with no subdomain, and — when `BASE_DOMAIN` is configured —
- * anything that isn't a direct child of it.
- */
+// null for hosts that must not resolve: the apex, `www`, a bare hostname, and
+// anything that isn't a direct child of BASE_DOMAIN when it's configured.
 export function subdomainFor(hostname: string): string | null {
   const host = hostname.toLowerCase().replace(/\.$/, "");
 
@@ -99,12 +89,8 @@ async function lookup(subdomain: string): Promise<Route> {
     : { kind: "pending", status: "QUEUED" };
 }
 
-/**
- * Resolve a hostname's subdomain to a deployment, memoised for a few seconds.
- *
- * Without this every asset request costs a Postgres round trip — a single page
- * load of a bundled app is dozens of them.
- */
+// Memoised: without it every asset request is a Postgres round trip, and one
+// page load of a bundled app is dozens.
 export async function resolveDeployment(subdomain: string): Promise<Route> {
   const now = Date.now();
   const cached = cache.get(subdomain);

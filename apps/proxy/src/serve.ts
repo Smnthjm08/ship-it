@@ -12,10 +12,7 @@ import mime from "mime-types";
 
 const s3 = createS3Client();
 
-/**
- * Build artifacts whose filename carries a content hash never change, so they
- * can be cached forever. Everything else revalidates.
- */
+/** Hashed filenames never change, so cache forever. Everything else revalidates. */
 const IMMUTABLE_PREFIX = /^\/(?:_next\/static|_astro|assets|static)\//;
 const HASHED_FILENAME =
   /[.-][A-Za-z0-9_-]{8,}\.(?:js|mjs|css|woff2?|ttf|otf|png|jpe?g|gif|svg|webp|avif|ico)$/;
@@ -63,18 +60,9 @@ function isNotModified(error: unknown): boolean {
   return err?.$metadata?.httpStatusCode === 304 || err?.name === "NotModified";
 }
 
-/**
- * Fetch one key from S3.
- *
- * Conditional headers are forwarded so an unchanged asset costs a 304 instead
- * of a full transfer, and HEAD is answered with HeadObject rather than pulling
- * a body we would immediately throw away.
- *
- * Throws on anything that isn't a clean miss (bad credentials, a network
- * error, a 500 from the store) so the caller can answer 502 — silently
- * treating those as "file not found" is how a broken bucket ends up looking
- * like a working site serving the wrong page.
- */
+// Forwards conditional headers (unchanged asset = 304) and answers HEAD with
+// HeadObject. Throws on anything that isn't a clean miss so the caller can 502 —
+// treating a bad bucket as "not found" makes it look like a working site.
 async function fetchObject(
   key: string,
   req: Request,
@@ -163,13 +151,8 @@ function send(
   result.body.pipe(res);
 }
 
-/**
- * Candidate keys for a request path, in priority order.
- *
- * Static site generators emit clean URLs as either `about.html` or
- * `about/index.html`; without trying both, every multi-page export served here
- * falls through to the SPA fallback and renders its homepage on every route.
- */
+// Candidates in priority order. SSGs emit clean URLs as either `about.html` or
+// `about/index.html`; try both or every multi-page export serves its homepage.
 function candidatesFor(filePath: string): string[] {
   if (filePath.endsWith("/")) return [`${filePath}index.html`];
   if (path.posix.extname(filePath)) return [filePath];

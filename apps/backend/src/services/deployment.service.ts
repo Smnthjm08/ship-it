@@ -1,5 +1,5 @@
 import { prisma, Deployment, DeploymentLog, Prisma } from "@repo/db";
-import { enqueueBuild } from "@repo/shared";
+import { enqueueBuild, QueueUnavailableError } from "@repo/shared";
 
 export class DeploymentService {
   getAllDeployments(projectId: string): Promise<Deployment[]> {
@@ -86,7 +86,14 @@ export class DeploymentService {
     });
   }
 
-  /** Create a fresh deployment for a project and push it onto the build queue. */
+  /**
+   * Create a fresh deployment for a project and push it onto the build queue.
+   *
+   * The row is written before the enqueue, so a queue outage would otherwise
+   * leave a deployment sitting at QUEUED that no worker will ever see. Mark it
+   * FAILED instead and let the caller answer 503 — a visible failure the user
+   * can retry beats a build that silently never starts.
+   */
   async queueDeployment(
     projectId: string,
     branch: string,
@@ -94,7 +101,21 @@ export class DeploymentService {
     const deployment = await prisma.deployment.create({
       data: { projectId, status: "QUEUED", branch },
     });
-    await enqueueBuild(deployment.id);
+
+    try {
+      await enqueueBuild(deployment.id);
+    } catch (error) {
+      if (error instanceof QueueUnavailableError) {
+        await prisma.deployment
+          .update({
+            where: { id: deployment.id },
+            data: { status: "FAILED" },
+          })
+          .catch(() => {});
+      }
+      throw error;
+    }
+
     return deployment;
   }
 
