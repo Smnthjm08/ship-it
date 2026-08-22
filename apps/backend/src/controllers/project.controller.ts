@@ -31,7 +31,7 @@ export const listProjectsController = async (req: Request, res: Response) => {
       error: null,
     });
   } catch (error) {
-    console.error("Error fetching projects:", error);
+    req.log.error({ err: error }, "Error fetching projects");
     return res.status(500).json({
       message: "Internal server error",
       data: null,
@@ -59,7 +59,7 @@ export const getProjectController = async (req: Request, res: Response) => {
       error: null,
     });
   } catch (error) {
-    console.error("Error fetching project:", error);
+    req.log.error({ err: error }, "Error fetching project");
     return res.status(500).json({
       message: "Internal server error",
       data: null,
@@ -90,7 +90,7 @@ export const deleteProjectController = async (req: Request, res: Response) => {
       error: null,
     });
   } catch (error) {
-    console.error("Error deleting project:", error);
+    req.log.error({ err: error }, "Error deleting project");
     return res.status(500).json({
       message: "Internal server error",
       data: null,

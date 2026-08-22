@@ -38,7 +38,7 @@ export const listDeploymentsController = async (
       error: null,
     });
   } catch (error) {
-    console.error("Error fetching deployments:", error);
+    req.log.error({ err: error }, "Error fetching deployments");
     return res.status(500).json({
       message: "Internal server error",
       data: null,
@@ -96,7 +96,7 @@ export const redeployController = async (req: Request, res: Response) => {
         error: error.message,
       });
     }
-    console.error("Error queueing deployment:", error);
+    req.log.error({ err: error }, "Error queueing deployment");
     return res.status(500).json({
       message: "Internal server error",
       data: null,
@@ -125,7 +125,7 @@ export const getDeploymentController = async (req: Request, res: Response) => {
       error: null,
     });
   } catch (error) {
-    console.error("Error fetching deployment:", error);
+    req.log.error({ err: error }, "Error fetching deployment");
     return res.status(500).json({
       message: "Internal server error",
       data: null,
@@ -190,7 +190,7 @@ export const getDeploymentLogsController = async (
       error: null,
     });
   } catch (error) {
-    console.error("Error fetching deployment logs:", error);
+    req.log.error({ err: error }, "Error fetching deployment logs");
     return res.status(500).json({
       message: "Internal server error",
       data: null,
@@ -225,7 +225,7 @@ export const deleteDeploymentController = async (
       error: null,
     });
   } catch (error) {
-    console.error("Error deleting deployment:", error);
+    req.log.error({ err: error }, "Error deleting deployment");
     return res.status(500).json({
       message: "Internal server error",
       data: null,

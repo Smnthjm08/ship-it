@@ -24,7 +24,7 @@ async function authMiddleware(req: Request, res: Response, next: NextFunction) {
     req.user = session.user;
     next();
   } catch (error) {
-    console.error("Authentication error:", error);
+    req.log.error({ err: error }, "Authentication error");
     res.status(401).json({ message: "Unauthorized" });
   }
 }

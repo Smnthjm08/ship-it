@@ -87,7 +87,7 @@ export const newProjectController = async (req: Request, res: Response) => {
       error: null,
     });
   } catch (error) {
-    console.error("Error fetching github repository:", error);
+    req.log.error({ err: error }, "Error fetching github repository");
     res.status(500).json({
       message: "Internal server error",
       data: null,
@@ -214,7 +214,7 @@ export const createProjectController = async (req: Request, res: Response) => {
       res: newProject.deployments[0],
     });
   } catch (error) {
-    console.error("Error creating project:", error);
+    req.log.error({ err: error }, "Error creating project");
     res.status(500).json({ message: "Internal server error" });
   }
 };

@@ -25,7 +25,7 @@ export const listEnvVarsController = async (req: Request, res: Response) => {
       error: null,
     });
   } catch (error) {
-    console.error("Error fetching environment variables:", error);
+    req.log.error({ err: error }, "Error fetching environment variables");
     return res.status(500).json({
       message: "Internal server error",
       data: null,
@@ -63,7 +63,7 @@ export const replaceEnvVarsController = async (req: Request, res: Response) => {
         .status(400)
         .json({ message: error.message, data: null, error: error.message });
     }
-    console.error("Error saving environment variables:", error);
+    req.log.error({ err: error }, "Error saving environment variables");
     return res.status(500).json({
       message: "Internal server error",
       data: null,

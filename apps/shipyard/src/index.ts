@@ -6,6 +6,8 @@ import {
   recoverStaleBuilds,
   publishDeploymentLog,
 } from "@repo/shared";
+import { logger, deploymentLogger, type Logger } from "@repo/shared/logger";
+import { requireEnv, SHIPYARD_REQUIRED_ENV } from "@repo/shared/env/require";
 import { prisma, DeploymentStatus } from "@repo/db";
 import { cloneRepo } from "./git/clone-repo";
 import { buildInContainer } from "./build-in-container";
@@ -25,26 +27,32 @@ async function setStatus(deploymentId: string, status: DeploymentStatus) {
 }
 
 async function startWorker() {
+  // A build that reaches the upload step with no bucket configured has already
+  // burned minutes of container time for nothing.
+  requireEnv(SHIPYARD_REQUIRED_ENV, "shipyard");
+
   await connectRedis();
-  console.log("Redis connected successfully");
+  logger.info("Redis connected");
 
   // A build that was in flight when the worker last died is still parked on the
   // processing list — put it back on the queue instead of losing it.
   const recovered = await recoverStaleBuilds();
   if (recovered.length) {
-    console.log("Requeued orphaned deployments:", recovered.join(", "));
+    logger.warn({ recovered }, "Requeued orphaned deployments");
   }
 
-  console.log("Worker started, waiting for deployments...");
+  logger.info("Worker started, waiting for deployments");
 
   while (true) {
     let deploymentIdElement: string | null = null;
     let repoDir: string | null = null;
+    // Rebound once a job is reserved, so every line below carries its id.
+    let log: Logger = logger;
     try {
-      console.log("Waiting for deployment...");
       deploymentIdElement = await reserveBuild(0);
       if (!deploymentIdElement) continue;
-      console.log("Received deploymentId:", deploymentIdElement);
+      log = deploymentLogger(deploymentIdElement);
+      log.info("Reserved deployment");
 
       const deployment = await prisma.deployment.findUnique({
         where: { id: deploymentIdElement },
@@ -69,7 +77,7 @@ async function startWorker() {
       await setStatus(deployment.id, DeploymentStatus.CLONING);
 
       repoDir = await cloneRepo(deployment);
-      console.log("Repo cloned successfully:", repoDir);
+      log.info({ repoDir }, "Repo cloned");
 
       await setStatus(deployment.id, DeploymentStatus.BUILDING);
 
@@ -89,11 +97,11 @@ async function startWorker() {
         deployment.project.framework,
         envVars,
       );
-      console.log("Docker build successfull");
+      log.info("Build finished");
 
       await setStatus(deployment.id, DeploymentStatus.COMPLETED);
     } catch (error) {
-      console.error("Error processing deployment:", error);
+      log.error({ err: error }, "Deployment failed");
       if (deploymentIdElement) {
         const message =
           error instanceof Error ? error.message : "Unknown build error";
@@ -108,7 +116,7 @@ async function startWorker() {
           });
           await setStatus(deploymentIdElement, DeploymentStatus.FAILED);
         } catch (e) {
-          console.error("Failed to update deployment status to FAILED", e);
+          log.error({ err: e }, "Could not mark deployment FAILED");
         }
       }
       await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -119,20 +127,23 @@ async function startWorker() {
         try {
           await ackBuild(deploymentIdElement);
         } catch (e) {
-          console.error("Failed to ack deployment:", deploymentIdElement, e);
+          log.error({ err: e }, "Could not ack deployment");
         }
       }
       // Always remove the cloned repo so the worker's disk doesn't fill up.
       if (repoDir && fs.existsSync(repoDir)) {
         try {
           fs.rmSync(repoDir, { recursive: true, force: true });
-          console.log("Cleaned up clone dir:", repoDir);
+          log.debug({ repoDir }, "Cleaned up clone dir");
         } catch (e) {
-          console.error("Failed to clean up clone dir:", repoDir, e);
+          log.error({ err: e, repoDir }, "Could not clean up clone dir");
         }
       }
     }
   }
 }
 
-startWorker();
+startWorker().catch((err) => {
+  logger.error({ err }, "Worker failed to start");
+  process.exit(1);
+});

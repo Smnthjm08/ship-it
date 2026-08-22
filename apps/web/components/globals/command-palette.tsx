@@ -23,6 +23,7 @@ import {
   Sun,
 } from "lucide-react";
 import {
+  Command,
   CommandDialog,
   CommandEmpty,
   CommandGroup,
@@ -108,118 +109,130 @@ export function CommandPaletteProvider({
         title="Command palette"
         description="Jump to a project or run an action"
       >
-        <CommandInput placeholder="Search projects and actions…" />
-        <CommandList>
-          <CommandEmpty>No results.</CommandEmpty>
+        {/* This repo's CommandDialog renders only Dialog + DialogContent — it
+            does not wrap children in <Command> the way stock shadcn does, so
+            the cmdk context has to be established here or CommandInput throws
+            "Cannot read properties of undefined (reading 'subscribe')". */}
+        <Command>
+          <CommandInput placeholder="Search projects and actions…" />
+          <CommandList>
+            <CommandEmpty>No results.</CommandEmpty>
 
-          <CommandGroup heading="Go to">
-            <CommandItem
-              onSelect={() => run(() => router.push("/projects"))}
-              value="projects all projects"
-            >
-              <Layers />
-              All projects
-            </CommandItem>
-            <CommandItem
-              onSelect={() => run(() => router.push("/deployments"))}
-              value="deployments activity"
-            >
-              <Rocket />
-              All deployments
-            </CommandItem>
-            <CommandItem
-              onSelect={() => run(() => router.push("/new"))}
-              value="new project import repository"
-            >
-              <PlusCircle />
-              New project
-            </CommandItem>
-          </CommandGroup>
+            <CommandGroup heading="Go to">
+              <CommandItem
+                onSelect={() => run(() => router.push("/projects"))}
+                value="projects all projects"
+              >
+                <Layers />
+                All projects
+              </CommandItem>
+              <CommandItem
+                onSelect={() => run(() => router.push("/deployments"))}
+                value="deployments activity"
+              >
+                <Rocket />
+                All deployments
+              </CommandItem>
+              <CommandItem
+                onSelect={() => run(() => router.push("/new"))}
+                value="new project import repository"
+              >
+                <PlusCircle />
+                New project
+              </CommandItem>
+            </CommandGroup>
 
-          {projectId && (
-            <>
-              <CommandSeparator />
-              <CommandGroup heading="This project">
-                <CommandItem
-                  onSelect={() =>
-                    run(() => router.push(`/projects/${projectId}`))
-                  }
-                  value="overview this project"
-                >
-                  <LayoutDashboard />
-                  Overview
-                </CommandItem>
-                <CommandItem
-                  onSelect={() =>
-                    run(() => router.push(`/projects/${projectId}/deployments`))
-                  }
-                  value="project deployments builds"
-                >
-                  <Rocket />
-                  Deployments
-                </CommandItem>
-                <CommandItem
-                  onSelect={() =>
-                    run(() => router.push(`/projects/${projectId}/environment`))
-                  }
-                  value="environment variables secrets env"
-                >
-                  <SlidersHorizontal />
-                  Environment
-                </CommandItem>
-                <CommandItem
-                  onSelect={() =>
-                    run(() => router.push(`/projects/${projectId}/settings`))
-                  }
-                  value="project settings build config"
-                >
-                  <Settings />
-                  Settings
-                </CommandItem>
-                <CommandItem
-                  onSelect={() => run(redeploy)}
-                  value="redeploy rebuild ship"
-                >
-                  <RotateCw />
-                  Redeploy
-                </CommandItem>
-              </CommandGroup>
-            </>
-          )}
-
-          {projects && projects.length > 0 && (
-            <>
-              <CommandSeparator />
-              <CommandGroup heading="Projects">
-                {projects.map((project) => (
+            {projectId && (
+              <>
+                <CommandSeparator />
+                <CommandGroup heading="This project">
                   <CommandItem
-                    key={project.id}
-                    value={`${project.name} ${project.id}`}
                     onSelect={() =>
-                      run(() => router.push(`/projects/${project.id}`))
+                      run(() => router.push(`/projects/${projectId}`))
                     }
+                    value="overview this project"
                   >
-                    <StatusDot status={project.deployments?.[0]?.status} />
-                    {project.name}
+                    <LayoutDashboard />
+                    Overview
                   </CommandItem>
-                ))}
-              </CommandGroup>
-            </>
-          )}
+                  <CommandItem
+                    onSelect={() =>
+                      run(() =>
+                        router.push(`/projects/${projectId}/deployments`),
+                      )
+                    }
+                    value="project deployments builds"
+                  >
+                    <Rocket />
+                    Deployments
+                  </CommandItem>
+                  <CommandItem
+                    onSelect={() =>
+                      run(() =>
+                        router.push(`/projects/${projectId}/environment`),
+                      )
+                    }
+                    value="environment variables secrets env"
+                  >
+                    <SlidersHorizontal />
+                    Environment
+                  </CommandItem>
+                  <CommandItem
+                    onSelect={() =>
+                      run(() => router.push(`/projects/${projectId}/settings`))
+                    }
+                    value="project settings build config"
+                  >
+                    <Settings />
+                    Settings
+                  </CommandItem>
+                  <CommandItem
+                    onSelect={() => run(redeploy)}
+                    value="redeploy rebuild ship"
+                  >
+                    <RotateCw />
+                    Redeploy
+                  </CommandItem>
+                </CommandGroup>
+              </>
+            )}
 
-          <CommandSeparator />
-          <CommandGroup heading="Preferences">
-            <CommandItem
-              onSelect={() =>
-                run(() => setTheme(resolvedTheme === "dark" ? "light" : "dark"))
-              }
-              value="theme dark light appearance"
-            >
-              {resolvedTheme === "dark" ? <Sun /> : <Moon />}
-              Switch to {resolvedTheme === "dark" ? "light" : "dark"} theme
-            </CommandItem>
-          </CommandGroup>
-        </CommandList>
+            {projects && projects.length > 0 && (
+              <>
+                <CommandSeparator />
+                <CommandGroup heading="Projects">
+                  {projects.map((project) => (
+                    <CommandItem
+                      key={project.id}
+                      value={`${project.name} ${project.id}`}
+                      onSelect={() =>
+                        run(() => router.push(`/projects/${project.id}`))
+                      }
+                    >
+                      <StatusDot status={project.deployments?.[0]?.status} />
+                      {project.name}
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </>
+            )}
+
+            <CommandSeparator />
+            <CommandGroup heading="Preferences">
+              <CommandItem
+                onSelect={() =>
+                  run(() =>
+                    setTheme(resolvedTheme === "dark" ? "light" : "dark"),
+                  )
+                }
+                value="theme dark light appearance"
+              >
+                {resolvedTheme === "dark" ? <Sun /> : <Moon />}
+                Switch to {resolvedTheme === "dark" ? "light" : "dark"} theme
+              </CommandItem>
+            </CommandGroup>
+          </CommandList>
+        </Command>
       </CommandDialog>
     </PaletteContext.Provider>
   );

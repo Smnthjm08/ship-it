@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Eye, EyeOff, Plus, Trash2, ClipboardPaste } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 import { Textarea } from "@/components/ui/textarea";
 import { parseDotEnv, type EnvVarRow } from "@/lib/env-vars";
 
@@ -76,11 +77,25 @@ export function EnvVarEditor({ rows, onChange, disabled }: EnvVarEditorProps) {
               <div className="relative flex-1">
                 <Input
                   aria-label={`Value for ${row.key || `variable ${index + 1}`}`}
-                  type={revealed.has(index) ? "text" : "password"}
+                  // Never type="password": Chrome and Brave deliberately ignore
+                  // autoComplete="off" on credential fields, so the built-in
+                  // password manager covers the row with a list of saved logins
+                  // and offers to save the value as one. Masking is done with
+                  // -webkit-text-security instead, which no manager reacts to.
+                  type="text"
                   autoComplete="off"
                   spellCheck={false}
+                  autoCorrect="off"
+                  autoCapitalize="off"
+                  // Respected by 1Password, LastPass and Bitwarden respectively.
+                  data-1p-ignore
+                  data-lpignore="true"
+                  data-bwignore
                   placeholder={row.stored ? "•••••• (unchanged)" : "value"}
-                  className="pr-9 font-mono text-sm"
+                  className={cn(
+                    "pr-9 font-mono text-sm",
+                    !revealed.has(index) && "[-webkit-text-security:disc]",
+                  )}
                   value={row.value}
                   disabled={disabled}
                   onChange={(e) => update(index, { value: e.target.value })}

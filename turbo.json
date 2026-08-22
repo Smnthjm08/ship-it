@@ -25,7 +25,8 @@
     "DEPLOY_BASE_DOMAIN",
     "NEXT_PUBLIC_DEPLOY_HOST",
     "PROXY_ROUTE_CACHE_TTL_MS",
-    "PROXY_ROUTE_CACHE_MISS_TTL_MS"
+    "PROXY_ROUTE_CACHE_MISS_TTL_MS",
+    "LOG_LEVEL"
   ],
   "tasks": {
     "build": {

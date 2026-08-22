@@ -1,4 +1,5 @@
 import fs from "fs";
+import { logger } from "@repo/shared/logger";
 import path from "path";
 import { decryptSecret } from "@repo/shared/crypto/secrets";
 import { parseDotEnv, serializeDotEnv } from "@repo/shared/env/vars";
@@ -80,6 +81,6 @@ export function excludeDotEnvFromGit(cloneDir: string, rootDir: string): void {
       fs.appendFileSync(excludePath, entry);
     }
   } catch (e) {
-    console.warn("Could not update .git/info/exclude:", e);
+    logger.warn({ err: e }, "Could not update .git/info/exclude");
   }
 }

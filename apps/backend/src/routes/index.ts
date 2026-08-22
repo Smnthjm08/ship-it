@@ -2,6 +2,11 @@ import { Router, Request, Response } from "express";
 import { isQueueReady } from "@repo/shared";
 import authMiddleware from "../middlewares/auth.middleware";
 import {
+  createProjectLimiter,
+  deploymentLimiter,
+  githubSearchLimiter,
+} from "../middlewares/rate-limit.middleware";
+import {
   newProjectController,
   createProjectController,
 } from "../controllers/new-project.controller";
@@ -38,8 +43,8 @@ v1Router.get("/health", (_req: Request, res: Response) => {
 });
 
 // Repo search + project creation (the "import a repo" flow).
-v1Router.get("/new", authMiddleware, newProjectController);
-v1Router.post("/new", authMiddleware, createProjectController);
+v1Router.get("/new", authMiddleware, githubSearchLimiter, newProjectController);
+v1Router.post("/new", authMiddleware, createProjectLimiter, createProjectController);
 
 // Projects
 v1Router.get("/projects", authMiddleware, listProjectsController);
@@ -67,6 +72,7 @@ v1Router.get(
 v1Router.post(
   "/projects/:projectId/deployments",
   authMiddleware,
+  deploymentLimiter,
   redeployController,
 );
 

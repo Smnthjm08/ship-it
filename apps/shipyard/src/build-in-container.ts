@@ -8,6 +8,7 @@ import type { EnvVarPair } from "@repo/shared/env/vars";
 import { resolveWithin } from "./paths.js";
 import { getAllFiles } from "./get-all-files";
 import { uploadFile } from "./aws";
+import { deploymentLogger } from "@repo/shared/logger";
 import { excludeDotEnvFromGit, writeDotEnvFile } from "./env/project-env";
 import { prepareNextProject } from "./frameworks/nextjs";
 
@@ -103,7 +104,7 @@ class LogSink {
         })),
       });
     } catch (e) {
-      console.error("Failed to persist deployment logs:", e);
+      deploymentLogger(this.deploymentId).error({ err: e }, "Could not persist deployment logs");
     }
   }
 
@@ -243,16 +244,17 @@ export const buildInContainer = async (
   framework: Framework | null = null,
   envVars: EnvVarPair[] = [],
 ) => {
+  const log = deploymentLogger(deploymentId);
   const logs = new LogSink(deploymentId);
   // Before anything can be written to the log stream.
   logs.setSecrets(envVars.map((v) => v.value));
 
   try {
     await docker.ping();
-    console.log("Docker connection established!");
+    log.debug("Docker connection established");
 
     const absolutePath = path.resolve(cloneDir);
-    console.log(`Mounting ${absolutePath} to /app`);
+    log.debug({ absolutePath }, "Mounting clone into container");
 
     // Every host path below derives from rootDir, so contain it once here.
     const projectRoot = resolveWithin(absolutePath, rootDir, "root directory");
@@ -260,11 +262,11 @@ export const buildInContainer = async (
     const WORKDIR = projectRoot.relative
       ? path.posix.join("/app", projectRoot.relative)
       : "/app";
-    console.log(`Working directory: ${WORKDIR}`);
+    log.debug({ workdir: WORKDIR }, "Working directory resolved");
 
     // detect package manager using the sub-directory if rootDir is specified
     const packageManager = detectPackageManager(projectRoot.absolute);
-    console.log(`Detected package manager: ${packageManager}`);
+    log.info({ packageManager }, "Detected package manager");
 
     let installCmd = installCommand;
     if (!installCmd || installCmd === "npm run install") {
@@ -312,10 +314,10 @@ export const buildInContainer = async (
     // length-capped by `command()` in @repo/shared/validation/project, which is
     // what stops a newline forging extra lines in the build log below.
     const cmd = ["/bin/sh", "-c", `${prelude}${installCmd} && ${buildCmd}`];
-    console.log(`Executing command: ${cmd.join(" ")}`);
+    log.debug({ installCmd, buildCmd }, "Resolved build command");
     logs.line(`$ ${installCmd} && ${buildCmd}`);
 
-    console.log("Starting Build...");
+    log.info("Starting build");
     // Use node:20-alpine as base for now, can be dynamic later
     const image = "node:20-alpine";
 
@@ -323,9 +325,9 @@ export const buildInContainer = async (
     try {
       await docker.getImage(image).inspect();
       imageExists = true;
-      console.log("Image exists locally");
+      log.debug({ image }, "Image present locally");
     } catch {
-      console.log("Image does not exist locally, pulling...");
+      log.info({ image }, "Pulling build image");
     }
 
     if (!imageExists) {
@@ -339,7 +341,7 @@ export const buildInContainer = async (
               resolve(output);
             },
             (event) => {
-              console.log(event.status);
+              log.trace({ status: event.status }, "Image pull progress");
             },
           );
         });
@@ -375,7 +377,7 @@ export const buildInContainer = async (
       WorkingDir: WORKDIR,
     });
 
-    console.log("Container created:", container.id);
+    log.debug({ containerId: container.id }, "Container created");
 
     // Attach to container streams before starting
     const stream = await container.attach({
@@ -404,9 +406,7 @@ export const buildInContainer = async (
     let timedOut = false;
     const timer = setTimeout(() => {
       timedOut = true;
-      console.error(
-        `Build exceeded ${BUILD_TIMEOUT_MS}ms — stopping container`,
-      );
+      log.error({ timeoutMs: BUILD_TIMEOUT_MS }, "Build exceeded timeout — stopping container");
       logs.line(`Build timed out after ${BUILD_TIMEOUT_MS / 1000}s`);
       // AutoRemove cleans up once stopped; fall back to kill if stop fails.
       container.stop({ t: 0 }).catch(() => container.kill().catch(() => {}));
@@ -426,11 +426,11 @@ export const buildInContainer = async (
     const statusCode = result.StatusCode;
 
     if (statusCode !== 0) {
-      console.error(`Build failed with status code: ${statusCode}`);
+      log.error({ statusCode }, "Build exited non-zero");
       throw new Error(`Build failed with status code: ${statusCode}`);
     }
 
-    console.log(`Build Success!`);
+    log.info("Build succeeded");
 
     // Detection from package.json wins, but honour the user's pick as a
     // fallback so a project whose deps we couldn't read still checks `out`.
@@ -440,7 +440,7 @@ export const buildInContainer = async (
       isNext || framework === "NEXTJS",
     );
 
-    console.log(`Uploading artifacts from ${distFolder}...`);
+    log.info({ distFolder }, "Uploading artifacts");
     logs.line(`Uploading artifacts from ${path.basename(distFolder)}...`);
     const allFiles = getAllFiles(distFolder);
 
@@ -449,7 +449,7 @@ export const buildInContainer = async (
       const s3Key = `${deploymentId}/${relativePath}`;
       await uploadFile(s3Key, file);
     }
-    console.log("Upload complete!");
+    log.info("Upload complete");
     logs.line(`Uploaded ${allFiles.length} files.`);
   } finally {
     // The worker records the failure message itself, so nothing to log here —

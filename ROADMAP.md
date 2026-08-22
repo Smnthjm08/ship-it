@@ -61,13 +61,13 @@ on it. Everything else can wait.
 
 ## Before launch
 
-Ordered by what actually bites first.
+Ordered by what actually bites first. Three closed 2026-08-22.
 
-- [ ] Structured logging (Pino) with `deploymentId` and a request ID in context — a failed production build is currently unsearchable
-- [ ] `helmet` security headers
-- [ ] Request body size limit — `express.json({ limit: "1mb" })`
-- [ ] Rate limiting on project creation and the deployment trigger
-- [ ] Validate required env vars at process startup in backend and shipyard
+- [x] **Structured logging.** `@repo/shared/logger` (subpath-only, so pino never reaches the browser bundle). Backend uses `pino-http`: every request gets an `x-request-id` — honouring an inbound one — and controllers log through `req.log`, so one failing call is followed across middleware, controller and service. Shipyard binds a `deploymentLogger(deploymentId)` child, so every build line carries its id. JSON in production, pretty in dev; `accessToken`/`cookie`/`authorization` redacted. `LOG_LEVEL` added to `turbo.json` globalEnv and `.env.example`.
+- [x] **`helmet` security headers** — with `crossOriginResourcePolicy: cross-origin`, since this is a JSON API read from the web app's origin and CORS already gates who may read it.
+- [x] **Request body size limit** — `express.json({ limit: "1mb" })`, plus a 413 branch in the error handler so an oversized body doesn't report as a 500.
+- [x] **Rate limiting.** `express-rate-limit` keyed on `req.user.id`, mounted after `authMiddleware` so unauthenticated traffic can't burn a user's quota and one account behind a shared NAT can't exhaust everyone else's. Create project 10/min, redeploy 12/min, GitHub repo search 30/min (it proxies GitHub's own quota). Verified: 11th request returns 429 with `RateLimit: limit=10, remaining=0`, and a second user is unaffected.
+- [x] **Env vars validated at startup.** `@repo/shared/env/require` throws listing *every* missing variable at once, with a pointer to `turbo.json` globalEnv — the failure mode that actually bites, since strict mode strips undeclared vars and they read as `undefined` even when set in `.env`. Backend checks before its first import that reads one; shipyard checks before the worker loop, so a missing bucket fails immediately instead of after minutes of container time.
 - [ ] S3 upload parallelism — `build-in-container.ts:451` awaits each file in sequence
 - [ ] Dead-letter queue — `recoverStaleBuilds()` requeues on restart but nothing handles repeated failure
 - [ ] Health endpoint on shipyard (backend and proxy already have one) reporting Redis, DB and Docker daemon status
