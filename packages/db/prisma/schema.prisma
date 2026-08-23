@@ -145,6 +145,11 @@ model Deployment {
   id        String           @id @default(cuid())
   projectId String
   branch    String           @default("main")
+  /// DNS-safe form of `branch`, resolved by the proxy for branch previews at
+  /// `<branchSlug>--<projectId>`. Stored rather than derived because slugging is
+  /// lossy — two branch names can share a slug, and the URL has to resolve
+  /// against whatever was actually stored.
+  branchSlug String?
   status    DeploymentStatus @default(QUEUED)
   createdAt DateTime         @default(now())
   updatedAt DateTime         @updatedAt
@@ -155,6 +160,8 @@ model Deployment {
 
   // Deployment lists, and the proxy's "latest COMPLETED for this project".
   @@index([projectId, createdAt])
+  // The proxy's branch-preview lookup.
+  @@index([projectId, branchSlug, createdAt])
   @@map("deployment")
 }
 

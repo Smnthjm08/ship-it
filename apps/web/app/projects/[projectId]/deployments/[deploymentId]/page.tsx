@@ -6,7 +6,7 @@ import { auth } from "@repo/auth/server";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, ExternalLink, GitBranch } from "lucide-react";
 import { DeploymentLogs } from "./deployment-logs";
-import { deploymentUrl } from "@/lib/deployment-url";
+import { branchUrl, deploymentUrl } from "@/lib/deployment-url";
 import { RedeployButton } from "@/components/deployments/redeploy-button";
 import { absoluteTime, duration, relativeTime, shortId } from "@/lib/format";
 import { statusMeta } from "@/lib/deployment-status";
@@ -67,10 +67,25 @@ export default async function DeploymentPage({ params }: DeploymentPageProps) {
 
           {/* Machine facts on one line, in mono, so they read as data. */}
           <div className="text-muted-foreground font-machine mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
-            <span className="inline-flex items-center gap-1">
-              <GitBranch className="size-3" aria-hidden />
-              {deployment.branch}
-            </span>
+            {/* The branch name links to its preview, which tracks the newest
+                completed build of that branch rather than this one build. */}
+            {deployment.status === "COMPLETED" ? (
+              <a
+                href={branchUrl(deployment.branch, deployment.project.id)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-foreground inline-flex items-center gap-1 transition-colors duration-150 ease-shipit"
+                title={`Preview for ${deployment.branch}`}
+              >
+                <GitBranch className="size-3" aria-hidden />
+                {deployment.branch}
+              </a>
+            ) : (
+              <span className="inline-flex items-center gap-1">
+                <GitBranch className="size-3" aria-hidden />
+                {deployment.branch}
+              </span>
+            )}
             <span aria-hidden>·</span>
             <span title={deployment.id}>{shortId(deployment.id)}</span>
             <span aria-hidden>·</span>

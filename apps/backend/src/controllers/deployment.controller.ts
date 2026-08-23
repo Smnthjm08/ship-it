@@ -77,9 +77,22 @@ export const redeployController = async (req: Request, res: Response) => {
       });
     }
 
+    // Defaults to the project's production branch; any other branch produces a
+    // preview at <branchSlug>--<projectId> instead of taking over the project URL.
+    const requested = (req.body ?? {}).branch;
+    if (requested !== undefined && typeof requested !== "string") {
+      const message = "branch must be a string";
+      return res.status(400).json({ message, data: null, error: message });
+    }
+    const branch = (requested ?? "").trim() || project.branch;
+    if (branch.length > 255 || /[\s\0]/.test(branch)) {
+      const message = "Invalid branch name";
+      return res.status(400).json({ message, data: null, error: message });
+    }
+
     const deployment = await deploymentService.queueDeployment(
       projectId,
-      project.branch,
+      branch,
     );
 
     return res.status(201).json({

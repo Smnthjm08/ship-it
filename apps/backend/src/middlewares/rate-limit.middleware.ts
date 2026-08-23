@@ -1,10 +1,9 @@
 import { Request } from "express";
 import rateLimit, { ipKeyGenerator } from "express-rate-limit";
 
-// Keyed by user, not IP: every limited route sits behind authMiddleware, and one
-// account behind a shared NAT shouldn't be able to exhaust everyone else's quota.
-// Falls back to the IP helper — which normalises IPv6 to a /56 — if `req.user`
-// is somehow absent, so the limiter can never key everything to `undefined`.
+// Keyed by user, not IP: these routes sit behind authMiddleware, and one account
+// behind a shared NAT shouldn't exhaust everyone else's quota. The IP fallback
+// stops the limiter keying everything to `undefined` if req.user is missing.
 const byUser = (req: Request) =>
   req.user?.id ?? ipKeyGenerator(req.ip ?? "", 56);
 
@@ -15,10 +14,7 @@ const message = (retryAfterSeconds: number) => ({
   error: "RATE_LIMITED",
 });
 
-/**
- * Creating a project writes a row, clones nothing yet, but immediately queues a
- * build — so this is the cheapest way to flood the worker.
- */
+/** Cheapest way to flood the worker: each one immediately queues a build. */
 export const createProjectLimiter = rateLimit({
   windowMs: 60_000,
   limit: 10,
@@ -28,11 +24,7 @@ export const createProjectLimiter = rateLimit({
   handler: (_req, res) => res.status(429).json(message(60)),
 });
 
-/**
- * Redeploys are the expensive path: each one occupies the single build worker
- * for minutes. The 409 on an in-flight build already stops the obvious case;
- * this bounds the rest.
- */
+/** Each occupies the single worker for minutes; the 409 only covers the obvious case. */
 export const deploymentLimiter = rateLimit({
   windowMs: 60_000,
   limit: 12,

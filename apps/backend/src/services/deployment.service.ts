@@ -10,6 +10,7 @@ import {
 type DeploymentWithProject = Deployment & {
   project: { id: string; name: string };
 };
+import { branchSlug } from "@repo/shared/branch/slug";
 import {
   enqueueBuild,
   QueueUnavailableError,
@@ -156,7 +157,12 @@ export class DeploymentService {
     branch: string,
   ): Promise<Deployment> {
     const deployment = await prisma.deployment.create({
-      data: { projectId, status: "QUEUED", branch },
+      data: {
+        projectId,
+        status: "QUEUED",
+        branch,
+        branchSlug: branchSlug(branch),
+      },
     });
 
     try {

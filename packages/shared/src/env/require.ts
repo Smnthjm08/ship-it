@@ -1,16 +1,6 @@
-// Subpath-only export (`@repo/shared/env/require`) — no Node-specific imports,
-// but it must never be pulled into the browser bundle via the barrel either.
-
-/**
- * Fail at startup when a required variable is missing, listing every one at once
- * rather than dying on the first.
- *
- * The failure this prevents is the quiet one: `process.env.X!` is a lie to the
- * type checker, so a missing value surfaces minutes later as a confusing runtime
- * error — an undefined connection string, a build that uploads nowhere. Worse
- * under Turborepo, where a variable missing from `globalEnv` is stripped from
- * the task environment and reads as `undefined` even though it is set in `.env`.
- */
+// Lists every missing variable at once. `process.env.X!` lies to the type
+// checker, so without this a missing value surfaces minutes later as an
+// undefined connection string or a build that uploads nowhere.
 export function requireEnv(names: readonly string[], service: string): void {
   const missing = names.filter((name) => {
     const value = process.env[name];
@@ -41,10 +31,7 @@ export const BACKEND_REQUIRED_ENV = [
   "GITHUB_CLIENT_SECRET",
 ] as const;
 
-/**
- * Everything a build needs end to end. `AWS_REGION` and `AWS_ENDPOINT` are
- * omitted deliberately — both have working defaults.
- */
+/** AWS_REGION and AWS_ENDPOINT are omitted — both have working defaults. */
 export const SHIPYARD_REQUIRED_ENV = [
   "DATABASE_URL",
   "REDIS_URL",

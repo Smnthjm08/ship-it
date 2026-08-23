@@ -11,6 +11,7 @@ import {
   firstValidationError,
 } from "@repo/shared/validation/project";
 import { envVarService } from "../services/env-var.service";
+import { branchSlug } from "@repo/shared/branch/slug";
 
 export const createProjectController = async (req: Request, res: Response) => {
   try {
@@ -85,6 +86,7 @@ export const createProjectController = async (req: Request, res: Response) => {
           create: {
             status: "QUEUED",
             branch,
+            branchSlug: branchSlug(branch),
           },
         },
       },

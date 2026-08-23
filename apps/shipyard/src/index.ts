@@ -51,9 +51,35 @@ async function startWorker() {
 
   // A build that was in flight when the worker last died is still parked on the
   // processing list — put it back on the queue instead of losing it.
-  const recovered = await recoverStaleBuilds();
-  if (recovered.length) {
-    logger.warn({ recovered }, "Requeued orphaned deployments");
+  const { requeued, deadLettered } = await recoverStaleBuilds();
+  if (requeued.length) {
+    logger.warn({ requeued }, "Requeued orphaned deployments");
+  }
+  if (deadLettered.length) {
+    // These crashed the worker MAX_BUILD_ATTEMPTS times. Mark them FAILED so the
+    // UI stops showing a build that will never run, and leave them on the
+    // dead-letter list for inspection or `replayDeadLetter()`.
+    logger.error(
+      { deadLettered },
+      "Deployments set aside after repeated worker crashes",
+    );
+    for (const deploymentId of deadLettered) {
+      await setStatus(deploymentId, DeploymentStatus.FAILED).catch((err) =>
+        logger.error(
+          { err, deploymentId },
+          "Could not mark dead letter FAILED",
+        ),
+      );
+      await prisma.deploymentLog
+        .create({
+          data: {
+            deploymentId,
+            message:
+              "Build abandoned: it crashed the build worker repeatedly. Check the build command and try again.",
+          },
+        })
+        .catch(() => {});
+    }
   }
 
   // One subscription for the worker's lifetime; requests for a build this
@@ -151,9 +177,7 @@ async function startWorker() {
             data: { activeDeploymentId: null },
           })
           .then(() => log.info("Cleared rollback pin — newer build is live"))
-          .catch((err) =>
-            log.error({ err }, "Could not clear rollback pin"),
-          );
+          .catch((err) => log.error({ err }, "Could not clear rollback pin"));
       }
     } catch (error) {
       // A cancelled build throws when its container is stopped. That is the

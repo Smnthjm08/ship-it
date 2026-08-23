@@ -28,6 +28,7 @@
   "exports": {
     ".": "./src/index.ts",
     "./aws/s3": "./src/aws/s3.ts",
+    "./branch/slug": "./src/branch/slug.ts",
     "./crypto/secrets": "./src/crypto/secrets.ts",
     "./env/require": "./src/env/require.ts",
     "./env/vars": "./src/env/vars.ts",

@@ -1,4 +1,5 @@
 import { prisma } from "@repo/db";
+import { parseBranchHostLabel } from "@repo/shared/branch/slug";
 import {
   BASE_DOMAIN,
   ROUTE_CACHE_MAX_ENTRIES,
@@ -57,6 +58,40 @@ async function lookup(subdomain: string): Promise<Route> {
     return { kind: "pending", status: deployment.status };
   }
 
+  // `<branchSlug>--<projectId>` is a branch preview: the newest completed build
+  // of that branch, independent of whatever production is serving. Checked
+  // before the project lookup because a preview label is never a bare id.
+  const branchHost = parseBranchHostLabel(subdomain);
+  if (branchHost) {
+    const preview = await prisma.deployment.findFirst({
+      where: {
+        projectId: branchHost.projectId,
+        branchSlug: branchHost.branchSlug,
+        status: "COMPLETED",
+        isDeleted: false,
+        project: { isDeleted: false },
+      },
+      orderBy: { createdAt: "desc" },
+      select: { id: true },
+    });
+    if (preview) return { kind: "ready", deploymentId: preview.id };
+
+    // Distinguish "this branch has never shipped" from a typo'd project.
+    const anyBuild = await prisma.deployment.findFirst({
+      where: {
+        projectId: branchHost.projectId,
+        branchSlug: branchHost.branchSlug,
+        isDeleted: false,
+      },
+      orderBy: { createdAt: "desc" },
+      select: { status: true },
+    });
+    if (!anyBuild) return { kind: "unknown" };
+    return anyBuild.status === "FAILED"
+      ? { kind: "failed" }
+      : { kind: "pending", status: anyBuild.status };
+  }
+
   // Otherwise treat it as a project id and serve its current production build.
   //
   // A rollback pins `activeDeploymentId`. The pin is only honoured if it still
@@ -64,7 +99,11 @@ async function lookup(subdomain: string): Promise<Route> {
   // site would 404 because of a stale pointer, which is a far worse failure
   // than quietly serving the newest good build.
   const pinned = await prisma.project.findFirst({
-    where: { id: subdomain, isDeleted: false, activeDeploymentId: { not: null } },
+    where: {
+      id: subdomain,
+      isDeleted: false,
+      activeDeploymentId: { not: null },
+    },
     select: { activeDeploymentId: true },
   });
 

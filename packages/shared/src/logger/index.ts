@@ -1,13 +1,11 @@
 import { pino, type Logger } from "pino";
 
-// Subpath-only export (`@repo/shared/logger`), like crypto/secrets and env/vars:
-// pino is a Node library and must never be pulled into the browser bundle.
+// Subpath-only export: pino must never reach the browser bundle.
 
 const isProduction = process.env.NODE_ENV === "production";
 
-// Production emits newline-delimited JSON, which is what a log aggregator can
-// actually query — the whole point of this over console.log. Pretty-printing is
-// dev-only and runs in a worker thread, so it can't be used in both.
+// NDJSON in production so an aggregator can query it; pretty-printing is
+// dev-only and runs in a worker thread.
 const transport = isProduction
   ? undefined
   : {
@@ -19,9 +17,8 @@ const transport = isProduction
       },
     };
 
-// Belt and braces: these keys carry GitHub tokens, session cookies and project
-// secrets. Redaction is by path, so it only fires on the shapes we know about —
-// it is not a substitute for not logging a secret in the first place.
+// By path, so it only fires on shapes we know about — not a substitute for not
+// logging a secret in the first place.
 const redact = {
   paths: [
     "accessToken",
@@ -43,10 +40,7 @@ export const logger: Logger = pino({
   redact,
 });
 
-/**
- * A logger bound to one deployment. Every line a build emits carries its
- * `deploymentId`, which is what makes a failed build searchable after the fact.
- */
+/** Binds `deploymentId` to every line, which is what makes a build searchable. */
 export function deploymentLogger(deploymentId: string): Logger {
   return logger.child({ deploymentId });
 }

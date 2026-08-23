@@ -31,6 +31,14 @@ export function isQueueReady(): boolean {
 export const BUILD_QUEUE = "deploymentId";
 /** Jobs a worker has reserved but not finished yet. */
 export const BUILD_PROCESSING_QUEUE = "deploymentId:processing";
+/** Jobs that crashed a worker too many times to keep retrying. */
+export const BUILD_DEAD_LETTER_QUEUE = "deploymentId:dead";
+/** deploymentId -> how many times a worker died holding it. */
+const BUILD_ATTEMPTS_KEY = "deploymentId:attempts";
+
+// Crashes only — a build that fails normally is acked and never counted. This is
+// for the job that kills the process, which startup recovery would replay forever.
+export const MAX_BUILD_ATTEMPTS = 3;
 
 // Callers have already written a QUEUED row by now, so they need to tell
 // "retry later" from "this deployment is a lie" — hence the typed error.
@@ -58,21 +66,50 @@ export async function reserveBuild(timeoutSeconds = 0): Promise<string | null> {
 /** Mark a reserved job as finished (success or terminal failure). */
 export async function ackBuild(deploymentId: string): Promise<void> {
   await redisQueue.lRem(BUILD_PROCESSING_QUEUE, 0, deploymentId);
+  // Terminal state clears the crash count.
+  await redisQueue.hDel(BUILD_ATTEMPTS_KEY, deploymentId).catch(() => {});
 }
 
-// Call at worker startup only: with more than one worker this also reclaims jobs
-// legitimately in flight elsewhere. Single worker, or use per-worker lists.
-export async function recoverStaleBuilds(): Promise<string[]> {
-  const recovered: string[] = [];
+/** Jobs set aside after repeated crashes, for inspection or manual replay. */
+export async function listDeadLetters(): Promise<string[]> {
+  return redisQueue.lRange(BUILD_DEAD_LETTER_QUEUE, 0, -1);
+}
+
+/** Put a dead-lettered job back on the queue with a clean attempt count. */
+export async function replayDeadLetter(deploymentId: string): Promise<void> {
+  await redisQueue.lRem(BUILD_DEAD_LETTER_QUEUE, 0, deploymentId);
+  await redisQueue.hDel(BUILD_ATTEMPTS_KEY, deploymentId).catch(() => {});
+  await redisQueue.lPush(BUILD_QUEUE, deploymentId);
+}
+
+// Startup only: with more than one worker this also reclaims jobs legitimately in
+// flight elsewhere. A job on the processing list at boot means the worker died
+// holding it — requeue, but count crashes so a poison job can't replay forever.
+export async function recoverStaleBuilds(): Promise<{
+  requeued: string[];
+  deadLettered: string[];
+}> {
+  const requeued: string[] = [];
+  const deadLettered: string[] = [];
+
   for (;;) {
-    const deploymentId = await redisQueue.lMove(
-      BUILD_PROCESSING_QUEUE,
-      BUILD_QUEUE,
-      "RIGHT",
-      "RIGHT",
-    );
+    const deploymentId = await redisQueue.rPop(BUILD_PROCESSING_QUEUE);
     if (!deploymentId) break;
-    recovered.push(deploymentId);
+
+    const attempts = await redisQueue.hIncrBy(
+      BUILD_ATTEMPTS_KEY,
+      deploymentId,
+      1,
+    );
+
+    if (attempts >= MAX_BUILD_ATTEMPTS) {
+      await redisQueue.lPush(BUILD_DEAD_LETTER_QUEUE, deploymentId);
+      deadLettered.push(deploymentId);
+    } else {
+      await redisQueue.rPush(BUILD_QUEUE, deploymentId);
+      requeued.push(deploymentId);
+    }
   }
-  return recovered;
+
+  return { requeued, deadLettered };
 }
