@@ -79,7 +79,7 @@ function LandingNav() {
 /* -------------------------------------------------------------------------- */
 
 const heroLines = [
-  { prefix: "$", text: "shipit deploy", muted: false },
+  { prefix: "→", text: "Deploying you/app (main)", muted: false },
   { prefix: "✓", text: "Cloning github.com/you/app", muted: true },
   { prefix: "✓", text: "Building in isolated container", muted: true },
   { prefix: "✓", text: "Uploading artifacts to storage", muted: true },
@@ -99,7 +99,7 @@ function TerminalCard() {
         />
         <span className="size-3 rounded-full bg-primary/50" aria-hidden />
         <span className="ml-2 font-mono text-xs text-muted-foreground">
-          ~/deploy
+          build log
         </span>
       </div>
       <div className="space-y-2 p-5 font-mono text-sm">

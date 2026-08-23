@@ -10,11 +10,11 @@
     "db:studio": "turbo run studio",
     "dev": "turbo run dev",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "lint": "turbo run lint",
     "generate": "turbo run generate",
+    "lint": "turbo run lint",
     "postinstall": "pnpm --filter @repo/db run db:generate",
-    "start": "turbo run start",
-    "prepare": "husky"
+    "prepare": "husky",
+    "start": "turbo run start"
   },
   "devDependencies": {
     "husky": "^9.1.7",

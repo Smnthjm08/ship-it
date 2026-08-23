@@ -125,7 +125,7 @@ export function BuildConfigForm({ projectId, initial }: BuildConfigFormProps) {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="NONE">No framework</SelectItem>
+                  <SelectItem value="NONE">Static HTML / no build</SelectItem>
                   <SelectItem value="NEXTJS">Next.js</SelectItem>
                   <SelectItem value="REACT">React</SelectItem>
                   <SelectItem value="VITE">Vite</SelectItem>

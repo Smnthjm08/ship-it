@@ -117,6 +117,7 @@ is installed, so Shipyard can't clone private repos with them.
 
 | Framework    | Output   | Notes                                                 |
 | ------------ | -------- | ----------------------------------------------------- |
+| Static HTML  | repo root | No build step — files are published as-is, in seconds |
 | Vite         | `dist`   | —                                                     |
 | React (CRA)  | `build`  | `CI` is never set, so warnings don't fail the build   |
 | Next.js      | `out`    | Forced to `output: "export"` — static only            |
@@ -126,6 +127,12 @@ Next.js repos are rewritten **in the throwaway clone**, never in your
 repository: the config is wrapped to force a static export, and server-only
 features (`middleware`, route handlers, `pages/api`, `getServerSideProps`,
 `force-dynamic`) fail the build within seconds instead of after a long install.
+
+A repo with no build script and an `index.html` is published directly — the
+build container is skipped entirely. `index.html` is looked for at the repo root
+and then in `public/`, `site/`, `www/`, `docs/` and `src/`; set the output
+directory in settings to point somewhere else. Setting a build command opts back
+into a normal build.
 
 Install and build commands are inferred from your lockfile — npm, pnpm, yarn and
 bun are all supported — and every field is editable afterwards under

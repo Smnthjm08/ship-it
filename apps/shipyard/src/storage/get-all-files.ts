@@ -9,7 +9,11 @@ import { realpathOrSelf } from "../paths.js";
  */
 const isSecretFile = (name: string) =>
   name === ".env" || name.startsWith(".env.");
-const isVcsDir = (name: string) => name === ".git";
+// Skipped by name, not because a build would emit them: a static site publishes
+// the repo root, where a committed node_modules would mean thousands of junk
+// objects in the bucket.
+const isSkippedDir = (name: string) =>
+  name === ".git" || name === "node_modules";
 
 const isInside = (candidate: string, root: string) =>
   candidate === root || candidate.startsWith(root + path.sep);
@@ -44,7 +48,7 @@ export const getAllFiles = (
     }
 
     if (entry.isDirectory()) {
-      if (isVcsDir(name)) continue;
+      if (isSkippedDir(name)) continue;
       getAllFiles(full, arrayOfFiles, root);
     } else if (entry.isFile()) {
       if (isSecretFile(name)) continue;

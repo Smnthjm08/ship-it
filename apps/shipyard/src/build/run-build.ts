@@ -1,7 +1,7 @@
 import path from "path";
 import { Framework } from "@repo/db";
 import type { EnvVarPair } from "@repo/shared/env/vars";
-import { deploymentLogger } from "@repo/shared/logger";
+import { deploymentLogger, type Logger } from "@repo/shared/logger";
 import { resolveWithin } from "../paths.js";
 import { getAllFiles } from "../storage/get-all-files.js";
 import { excludeDotEnvFromGit, writeDotEnvFile } from "../env/project-env.js";
@@ -31,6 +31,21 @@ const DEFAULT_BUILD: Record<string, string> = {
   bun: "bun run build",
   npm: "npm run build",
 };
+
+/** Collect a directory and upload it. The last step of both build paths. */
+async function publish(
+  dir: string,
+  deploymentId: string,
+  { log, logs }: { log: Logger; logs: LogSink },
+): Promise<void> {
+  const files = getAllFiles(dir);
+  log.info({ dir, files: files.length }, "Uploading artifacts");
+  logs.line(`Uploading ${files.length} files from ${path.basename(dir) || "/"}...`);
+
+  await uploadBuildArtifacts(files, dir, deploymentId);
+  log.info("Upload complete");
+  logs.line(`Uploaded ${files.length} files.`);
+}
 
 /**
  * Clone on disk → container → S3. Each step lives in its own module; this is
@@ -135,13 +150,7 @@ export const buildInContainer = async (
       isNext || framework === "NEXTJS",
     );
 
-    const allFiles = getAllFiles(distFolder);
-    log.info({ distFolder, files: allFiles.length }, "Uploading artifacts");
-    logs.line(`Uploading artifacts from ${path.basename(distFolder)}...`);
-
-    await uploadBuildArtifacts(allFiles, distFolder, deploymentId);
-    log.info("Upload complete");
-    logs.line(`Uploaded ${allFiles.length} files.`);
+    await publish(distFolder, deploymentId, { log, logs });
   } finally {
     // Flush whatever is still buffered, whether the build passed or threw.
     await logs.close();

@@ -19,6 +19,7 @@
     "AWS_BUCKET_NAME",
     "AWS_REGION",
     "BUILD_TIMEOUT_MS",
+    "SHIPYARD_HEALTH_PORT",
     "REDIS_URL",
     "PORT",
     "PROXY_PORT",

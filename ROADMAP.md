@@ -7,12 +7,16 @@ in [DESIGN.md](DESIGN.md) / [brand.md](brand.md), architecture in
 **Goal: portfolio-ready.** Security blockers and the operational basics
 (structured logging, rate limiting, headers, body cap, startup env validation)
 are done, and the schema is migrated. What's left is coverage and proof — there
-are still no tests and no CI, and the newest features have never been run.
+is not a single test file in the repo, no CI, and the newest features have never
+been run.
 
 ## Next up
 
 - [ ] Screenshots in the README — project list, build logs, import, environment
 - [ ] Walk the app signed in; nothing recent has been clicked
+- [ ] First test runner at all — pick vitest, then cover the pure units that the
+      Unverified list keeps assuming are covered (branch-slug round-trip,
+      output-dir resolution, `.env` parse/serialise)
 - [ ] One integration test: mock repo + Docker → does a build produce S3 artifacts
 - [ ] GitHub Actions CI: install → lint → type-check → build
 
@@ -21,7 +25,6 @@ are still no tests and no CI, and the newest features have never been run.
 - [ ] Health endpoint on shipyard (backend and proxy have one)
 - [ ] Sentry or equivalent error tracking
 - [ ] Docker Compose for local dev — _parked; blocks anyone else running the project_
-- [ ] `/dashboard` redirects to `/projects` until there's something worth showing
 
 ## Features
 
@@ -29,12 +32,11 @@ are still no tests and no CI, and the newest features have never been run.
 - [ ] Custom domains (DNS CNAME → proxy)
 - [ ] GitHub webhooks for push-to-deploy
 - [ ] Notifications (email / Slack / Discord)
-- [ ] AI deployment suggestions
 
 ## Repo hygiene
 
 - [ ] `pnpm audit` in CI, plus `gitleaks`/`trufflehog`
-- [ ] README needs the pipeline diagram above the fold and the env-var table
+- [ ] README needs an env-var table — it defers to `.env.example` today
 - [ ] API response envelope + OpenAPI spec
 
 ## Later
@@ -53,9 +55,12 @@ Dependabot, and a hosted demo (needs a VPS — the worker wants a Docker daemon)
 
 ## Unverified
 
-Type-checks and builds, never proven at runtime:
+Type-checks and builds, never proven at runtime. Nothing here is covered by a
+test either — there are none — so "reasoned" is the strongest claim any of it has:
 
-- Branch previews end to end — slug round-tripping is unit-tested, but no preview URL has been resolved by a running proxy
+- Branch previews end to end — no preview URL has been resolved by a running proxy
+- Deployment cancellation — the API route and the worker's abort path are wired
+  up, but no in-flight build has been cancelled against a live Docker daemon
 - Dead-letter path — the attempt counter and abandonment at 3 crashes have never been triggered
 - Rollback end to end — the pin, the proxy fallback and the auto-clear on a newer build are all unexercised against a real deployment
 - Command palette since its crash fix, plus the project switcher and mobile action bar — the palette threw on first open and has not been confirmed working since
