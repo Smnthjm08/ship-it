@@ -10,10 +10,10 @@ import {
 import { logger, deploymentLogger, type Logger } from "@repo/shared/logger";
 import { requireEnv, SHIPYARD_REQUIRED_ENV } from "@repo/shared/env/require";
 import { prisma, DeploymentStatus } from "@repo/db";
-import { cloneRepo } from "./git/clone-repo";
-import { buildInContainer } from "./build-in-container";
-import { decryptProjectEnv } from "./env/project-env";
-import { updateDeploymentStatus } from "./queries/deployment-status";
+import { cloneRepo } from "./git/clone-repo.js";
+import { buildInContainer } from "./build/run-build.js";
+import { decryptProjectEnv } from "./env/project-env.js";
+import { updateDeploymentStatus } from "./queries/deployment-status.js";
 
 /** Did this deployment get cancelled while we were building it? */
 async function wasCancelled(deploymentId: string | null): Promise<boolean> {

@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { realpathOrSelf } from "./paths.js";
+import { realpathOrSelf } from "../paths.js";
 
 /**
  * Never publish these, even if they sit inside the output directory. A project

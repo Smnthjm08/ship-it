@@ -33,11 +33,9 @@ are still no tests and no CI, and the newest features have never been run.
 
 ## Repo hygiene
 
-- [ ] Pin the build image to a digest, not the `node:20-alpine` tag
 - [ ] `pnpm audit` in CI, plus `gitleaks`/`trufflehog`
 - [ ] README needs the pipeline diagram above the fold and the env-var table
 - [ ] API response envelope + OpenAPI spec
-- [ ] Finish splitting `build-in-container.ts` — container creation, log streaming and the upload loop still share one file
 
 ## Later
 
@@ -66,4 +64,5 @@ Type-checks and builds, never proven at runtime:
 - Live polling during a build — needs Redis, Docker and the worker at once
 - Mobile at 375px — action bar and env-row wrapping both depend on it
 - Deployments created before the branchSlug migration have `NULL` slugs, so their branch preview URLs won't resolve — needs a backfill if you want them reachable
+- The split build pipeline and the pinned image digest — types and build pass, but no build has run through `run-build.ts` against a live Docker daemon
 - Env masking in Firefox — `-webkit-text-security` unsupported, so values show until toggled
