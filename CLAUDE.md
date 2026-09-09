@@ -51,13 +51,13 @@ There are no tests in this project yet.
 
 ### Apps
 
-| App         | Port | Purpose                                |
-| ----------- | ---- | -------------------------------------- |
-| `web`       | 3000 | Next.js frontend                       |
-| `backend`   | 3002 | Express REST API + better-auth         |
-| `shipyard`  | —    | Background Docker/S3 build worker      |
-| `ws-server` | 3003 | Streams live build logs over WebSocket |
-| `proxy`     | 8001 | Subdomain → S3 asset server            |
+| App         | Port | Purpose                                                        |
+| ----------- | ---- | -------------------------------------------------------------- |
+| `web`       | 3000 | Next.js frontend                                               |
+| `backend`   | 3002 | Express REST API + better-auth                                 |
+| `shipyard`  | 3004 | Background Docker/S3 build worker (port serves `/health` only) |
+| `ws-server` | 3003 | Streams live build logs over WebSocket                         |
+| `proxy`     | 8001 | Subdomain → S3 asset server                                    |
 
 ### Packages
 
@@ -82,7 +82,7 @@ you open a project.
 | ----------------------------- | ---------------------------- |
 | `/projects`                   | `/projects/[id]` — overview  |
 | `/deployments` (all projects) | `/projects/[id]/deployments` |
-| `/settings/account`           | `/projects/[id]/environment` |
+| `/profile`                    | `/projects/[id]/environment` |
 |                               | `/projects/[id]/settings`    |
 
 `/` is landing only; signed-in users go to `/projects`. `/dashboard` redirects to
@@ -115,7 +115,7 @@ Rules that matter when touching this:
 
 ### Package managers in the build container
 
-`node:20-alpine` ships npm and corepack only. `toolchainPrelude()` in `build-in-container.ts` prepends whatever the resolved commands need: `corepack enable` for pnpm/yarn, and `npm install -g bun` for bun, which corepack does not manage. It keys off the **commands**, not the detected lockfile, because a user can type `bun install` in a repo with no `bun.lockb` — that mismatch is what produces `sh: bun: not found` after the container has already started. `detectPackageManager()` recognises `bun.lockb`/`bun.lock` so bun repos get bun defaults.
+`node:20-alpine` ships npm and corepack only. `toolchainPrelude()` in `build/package-manager.ts` prepends whatever the resolved commands need: `corepack enable` for pnpm/yarn, and `npm install -g bun` for bun, which corepack does not manage. It keys off the **commands**, not the detected lockfile, because a user can type `bun install` in a repo with no `bun.lockb` — that mismatch is what produces `sh: bun: not found` after the container has already started. `detectPackageManager()` recognises `bun.lockb`/`bun.lock` so bun repos get bun defaults.
 
 Known bad combination: `typescript@7` (the native port) publishes only `lib/version.cjs` from its `exports` map and no compiler API, so Next's `next.config.ts` loader fails with `Cannot find module 'typescript'`. bun installs optional peers by default and will resolve `typescript` to 7 when the project doesn't pin it. Projects that pin `typescript@^5` are unaffected.
 
@@ -161,6 +161,7 @@ Defined in `.env.example` at the root.
 | `BUILD_TIMEOUT_MS`                                                                             | `shipyard` (default 10 min)             |
 | `PORT`                                                                                         | `backend` (default `3002`)              |
 | `PROXY_PORT` / `DEPLOY_BASE_DOMAIN` / `PROXY_ROUTE_CACHE_*_TTL_MS`                             | `proxy`                                 |
+| `SHIPYARD_HEALTH_PORT`                                                                         | `shipyard` (default `3004`)             |
 | `NEXT_PUBLIC_DEPLOY_HOST`                                                                      | `web` (must match `DEPLOY_BASE_DOMAIN`) |
 
 ## Conventions
@@ -178,5 +179,5 @@ Defined in `.env.example` at the root.
 - **Redis must be running** before starting `backend` or `shipyard` — both call `connectRedis()` at startup.
 - **Docker must be running** on the Shipyard host — it calls the Docker daemon via `dockerode` to spin up build containers.
 - **S3-compatible storage required** — `AWS_ENDPOINT` supports any S3-compatible service (Cloudflare R2, MinIO, etc.); the bucket must be pre-created.
-- **Static hosting only.** The proxy pipes files out of S3 — there is no Node runtime. Next.js deploys as a static export only; see below. A build that produces only `.next` fails on purpose in `build-in-container.ts`.
+- **Static hosting only.** The proxy pipes files out of S3 — there is no Node runtime. Next.js deploys as a static export only; see below. A build that produces only `.next` fails on purpose in `build/output-dir.ts`.
 - **The build queue is single-worker.** `recoverStaleBuilds()` requeues everything on the processing list at startup, so a second concurrent worker would steal in-flight jobs.

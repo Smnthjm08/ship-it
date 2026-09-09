@@ -14,6 +14,7 @@ import { cloneRepo } from "./git/clone-repo.js";
 import { buildInContainer } from "./build/run-build.js";
 import { decryptProjectEnv } from "./env/project-env.js";
 import { updateDeploymentStatus } from "./queries/deployment-status.js";
+import { startHealthServer } from "./health.js";
 
 /** Did this deployment get cancelled while we were building it? */
 async function wasCancelled(deploymentId: string | null): Promise<boolean> {
@@ -45,6 +46,10 @@ async function startWorker() {
   // A build that reaches the upload step with no bucket configured has already
   // burned minutes of container time for nothing.
   requireEnv(SHIPYARD_REQUIRED_ENV, "shipyard");
+
+  // Before connectRedis(), so a worker that can't reach Redis is still able to
+  // report that rather than looking dead.
+  startHealthServer(() => ({ activeDeploymentId }));
 
   await connectRedis();
   logger.info("Redis connected");

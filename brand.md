@@ -1,8 +1,6 @@
 # Brand — ShipIt
 
-_Status: deferred (design system adopted from a reference, not generated)_
-
-This project is **not** on stock shadcn defaults. It runs an Expo-derived system documented in [DESIGN.md](DESIGN.md) and wired into `apps/web/app/globals.css` as CSS variables. A Cal.com-derived spec came before it and was deleted on adoption — `globals.css` and `DESIGN.md` are the only source of truth.
+This project is **not** on stock shadcn defaults. It runs an Expo-derived system whose tokens are listed in [DESIGN.md](DESIGN.md) and wired into `apps/web/app/globals.css` as CSS variables. `globals.css` is the running source of truth; DESIGN.md is the reference.
 
 ## The direction in one line
 
@@ -17,15 +15,13 @@ Quietly-confident developer infrastructure: near-monochrome surfaces, **pure bla
 - **Type** — Inter for display _and_ body, split by weight (600 / 400) and negative tracking rather than by family; JetBrains Mono for code and every machine-generated value. `.text-display-mega` → `.text-nav-link` scale plus `.text-eyebrow` and `.font-machine` in `globals.css`
 - **Radius** — `--radius-none` through `--radius-2xl`, plus `--radius-pill` / `--radius-full`
 
-## Rules that aren't in DESIGN.md
+## Departures from the token reference
 
-DESIGN.md analyses a **marketing site**; ShipIt is a dark-first application. Three deliberate departures:
+The tokens describe a light **marketing** canvas; ShipIt is a dark-first application. Three deliberate departures:
 
-1. **Dark mode is the primary canvas.** DESIGN.md's `surface-dark` (#171717) is the app background, `surface-dark-elevated` (#1a1a1a) the one step of lift above it. The light theme is the faithful one.
+1. **Dark mode is the primary canvas.** `surface-dark` (#171717) is the app background, `surface-dark-elevated` (#1a1a1a) the one step of lift above it. The light theme is the faithful one.
 2. **Semantic colours are re-lit for dark.** The marketing amber (#ab6400) sits at ~2.6:1 on #171717, and `semantic-error` (#eb8e90) is a fill tint at 2.3:1 on white. Same hues, more luminance, in the `.dark` block; the pale rose survives as `--error-soft` for fills and borders.
 3. **Colour is the status channel.** Deployment state (green / amber / red / grey) is the only thing hue is spent on in app chrome. No branded buttons, no gradient headers, no coloured nav. Selection uses `--primary` and geometry, never the accent.
-
-To replace all of this with a generated palette, typography, and voice, run `/brand-design` or say "pick brand colors". It will detect this deferred state, skip the overwrite confirmation, and rewrite both `globals.css` and this file.
 
 ## Motion
 
@@ -35,7 +31,7 @@ sheets. Entrances longer than exits, on the single `--ease-shipit` curve. Never
 [reveal.tsx](apps/web/components/landing/reveal.tsx) for reduced motion: it
 renders the final state with zero movement.
 
-Open design work — the unused type scale, the two vendored primitives that still
-carry `transition-all` — is tracked in [ROADMAP.md](ROADMAP.md) under **Frontend**.
+Open design work: the type scale is only partly used, and two vendored
+primitives still carry `transition-all`.
 
-_Adopted: 2026-08-22 (Expo). Previously: Cal.com, deferred 2026-07-31._
+_Adopted 2026-08-22, from Expo's design language._

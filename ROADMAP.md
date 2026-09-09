@@ -22,7 +22,6 @@ been run.
 
 ## Before launch
 
-- [ ] Health endpoint on shipyard (backend and proxy have one)
 - [ ] Sentry or equivalent error tracking
 - [ ] Docker Compose for local dev — _parked; blocks anyone else running the project_
 
@@ -41,17 +40,15 @@ been run.
 
 ## Later
 
-**Scale** — horizontal shipyard workers (blocked: `recoverStaleBuilds()` would
-steal a peer's in-flight job; needs per-worker lists) · managed Redis · per-user
-concurrency limits and quotas · S3 lifecycle rules · Postgres read replica.
+Horizontal shipyard workers are the one architectural blocker worth writing
+down: `recoverStaleBuilds()` requeues the whole processing list at startup, so a
+second worker would steal a peer's in-flight job — it needs per-worker lists
+first. Everything else here is ordinary scaling work (managed Redis, per-user
+concurrency quotas, S3 lifecycle rules) and can wait for a reason to exist.
 
-**Enterprise** — OpenTelemetry/Prometheus · audit log · teams · build cache ·
-multi-region · SOC 2.
-
-## Open source — deferred
-
-Picked up after the portfolio pass: `CONTRIBUTING.md`, issue and PR templates,
-Dependabot, and a hosted demo (needs a VPS — the worker wants a Docker daemon).
+Open-source packaging — `CONTRIBUTING.md`, issue and PR templates, Dependabot,
+and a hosted demo (needs a VPS; the worker wants a Docker daemon) — is deferred
+until after the portfolio pass.
 
 ## Unverified
 
